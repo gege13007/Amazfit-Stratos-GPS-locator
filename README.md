@@ -12,9 +12,10 @@ You can wait sometimes 10-30 seconds for this first fix.
 
 Once the gps fix is done, the main menu appear.
 From up left to right : first button save the current position on the shared preferences of the wear.
-Second button recall a previous position and go to the radar.
+Second button recall a previous position and go to the gps radar.
 Third (bottom) is to exit, and the arrow is immediate radar return on the current position without save.
-(** a small green buton is hidden on the right - this launches a test of magnetic sensors).
+
+(** a small green button is hidden on the right - this launches a test of magnetic sensors).
 
 <center><img src="/gpsapp_31818537.jpg" alt="gps main menu amazfit"/></center>
 
