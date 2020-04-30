@@ -29,8 +29,11 @@ The first activity (gpsetup) launches a service who assumes the background task 
 The lat & long are broadcasted to the other activities with 'sendBroadcast & broadcastReceiver'.
 The first screen uses a 'nmealistener' to get & display a snapshot of the $GPGSV frames.
 The location service and its broadcats is only stopped, when the app is destroyed (if not - your battery don't last so long)...
+We use the 'magnetic orientation sensor type3' to rotate the compass graduations, with a sensorManager.registerListener.
 
 What's left to do ?
 ------------------
 ==> Implement a simple selection system for labels of multiples places...
+
 ==> Why not a small Golf gps with xml file export ???
+
