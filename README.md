@@ -23,12 +23,14 @@ In radar operation - the distance displayed on the center - the compass and dire
 
 <center><img src="/gpsapp_171818537.jpg" alt="gps radar stratos 2"/></center>
 
-How that work
--------------
-The first activity (gpsetup) launches a service with the locationManager and locationListener. This avoid to stop and re-run the gps listener between activities, and so just ONE first fix delay is necessary when you start the app.
+How this works
+--------------
+The first activity (gpsetup) launches a service who assumes the background task of getting GPS location (with a locationManager and locationListener). This avoid to stop and re-run the gps updates between each activities, and assures that just ONE first fix delay is necessary when you start the app.
 The lat & long are broadcasted to the other activities with 'sendBroadcast & broadcastReceiver'.
-The location service is only stopped when the app is destroyed (if not your battery don't last as long)...
+The first screen uses a 'nmealistener' to get & display a snapshot of the $GPGSV frames.
+The location service and its broadcats is only stopped, when the app is destroyed (if not - your battery don't last so long)...
 
 What's left to do ?
 ------------------
 ==> Implement a simple selection system for labels of multiples places...
+==> Why not a small Golf gps with xml file export ???
