@@ -1,5 +1,5 @@
-# Amazfit-Stratos-GPS-locator
-Simple &amp; effective radar GPS locator app for Amazfit Xiaomi android wear
+# Android Wear Amazfit GPS Direction Finder
+Simple &amp; effective GPS locator app for Amazfit Xiaomi android wear
 ------------------------------------------------------------------------------
 Hello guys, after a very hard work ( ͠° ͟ʖ ͡°) on Android Studio, here is my first version of a simple GPS locator for Xiaomi Wear Android  Amazfit Stratos 2.
 With this simple app , you can store your current location (for now or for later), and see the direction and distance to your point.
