@@ -32,6 +32,13 @@ The first screen uses a 'nmealistener' to get & display a snapshot of the $GPGSV
 The location service and its broadcats is only stopped, when the app is destroyed (if not - your battery don't last so long)...
 We use the 'magnetic orientation sensor type3' to rotate the compass graduations, with a sensorManager.registerListener.
 
+Change log
+----------
+30/4/2020 First upload v1
+1/5/2020  Location & NMEA broadcasted in the same manner by Locservice. Many checks to do.
+          Important Fix !!! Impossible to kill the entire process (sinking the battery). No explication. Find a solution with ' android.os.Process.killProcess(android.os.Process.myPid());' in OnDestroy().
+          RMC speed added on the scan screen.
+
 What's left to do ?
 ------------------
 ==> Implement a simple selection system for labels of multiples places...
