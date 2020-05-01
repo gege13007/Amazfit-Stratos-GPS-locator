@@ -34,7 +34,8 @@ We use the 'magnetic orientation sensor type3' to rotate the compass graduations
 
 Change log
 ----------
-30/4/2020 First upload v1
+30/4/2020 First upload v1.
+
 1/5/2020  Location & NMEA broadcasted in the same manner by Locservice. Many checks to do.
           Important Fix !!! Impossible to kill the entire process (sinking the battery). No explication. Find a solution with ' android.os.Process.killProcess(android.os.Process.myPid());' in OnDestroy().
           RMC speed added on the scan screen.
