@@ -39,6 +39,9 @@ Change log
 1/5/2020  Location & NMEA broadcasted in the same manner by Locservice. Many checks to do.
           Important Fix !!! Impossible to kill the entire process (sinking the battery). No explication. Find a solution with ' android.os.Process.killProcess(android.os.Process.myPid());' in OnDestroy().
           RMC speed added on the scan screen.
+         
+2/5/2020  Problem with onDestroy. Bug fix with unregister.Sensormanager.listener...
+
 
 What's left to do ?
 ------------------
