@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">GPS locator</string>
+    <string name="main_activity_content">Précision position</string>
+</resources>

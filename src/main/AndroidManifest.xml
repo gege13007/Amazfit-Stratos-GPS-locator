@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.samblancat.finder">
+
+    <uses-feature android:name="android.hardware.type.watch"/>
+    <uses-sdk tools:overrideLibrary="android.support.wear" />
+    <uses-feature android:name="android.location" />
+    <uses-feature android:name="android.hardware.location.gps" />
+
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/radaricon"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme">
+        <service
+            android:name="com.samblancat.finder.LocService"
+            android:exported="false"
+            android:enabled="true" >
+        </service>
+
+        <activity android:name=".GpsSetup">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".MainActivity">
+        </activity>
+        <activity android:name=".Scan">
+        </activity>
+        <activity android:name=".Scan2">
+        </activity>
+    </application>
+
+</manifest>

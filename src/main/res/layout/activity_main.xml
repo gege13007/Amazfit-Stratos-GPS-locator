@@ -1,0 +1,85 @@
+<!--
+    Android Wear framework is not provided on the Pace, and thus everything must be done manually with scrolling views and large padding
+ -->
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginTop="10dp"
+    android:clipToPadding="false"
+    android:keepScreenOn="true"
+    android:scrollbars="none">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#10101010"
+        android:orientation="vertical"
+        android:textAlignment="center">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="35dp"
+            android:gravity="center"
+            android:text="@string/app_name"
+            android:textAppearance="@style/Base.TextAppearance.AppCompat.Large"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/precistxt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/main_activity_content" />
+
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:gravity="center_horizontal"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:layout_width="55dp"
+                android:layout_height="52dp"
+                android:layout_marginRight="15dp"
+                android:background="@drawable/storein32"
+                android:onClick="storepos" />
+
+            <ImageButton
+                android:layout_width="55dp"
+                android:layout_height="52dp"
+                android:background="@drawable/readout32"
+                android:onClick="gotosavedpos" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:gravity="center_horizontal"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:id="@+id/closebouton"
+                android:layout_width="55dp"
+                android:layout_height="52dp"
+                android:layout_marginRight="15dp"
+                android:background="@drawable/quit32"
+                android:onClick="closecmd" />
+
+            <ImageButton
+                android:layout_width="55dp"
+                android:layout_height="52dp"
+                android:background="@drawable/finder32"
+                android:onClick="setposcmd" />
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>
+
