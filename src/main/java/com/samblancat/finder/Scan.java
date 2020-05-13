@@ -4,30 +4,40 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
+
 import java.text.DecimalFormat;
 
 public class Scan extends AppCompatActivity  implements SensorEventListener {
     private BroadcastReceiver receiver;
     public static final String BROADCAST_ACTION = "com.samblancat";
     Context mContext;
-    // device sensor manager
     private SensorManager mSensorManager;
+    SharedPreferences sharedPref;
     double mylat=0, mylng=0;
     double mylat0=0, mylng0=0;
     double cap, cap0, compas=0;
+    Integer compasok=1;
+    //Flag état de la recherche 0:rien,  1:scan rapprochement, 2:proche arrivé, 3:s'éloigne
+    Integer arrived=0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        TextView dtxt;
+
+        setContentView(R.layout.scan);
+        mContext=this;
 
         //Retrouve Position Départ
         Intent intent = getIntent();
@@ -35,15 +45,22 @@ public class Scan extends AppCompatActivity  implements SensorEventListener {
         if (myl!=null) mylat0 = Double.parseDouble(myl);
         myl = intent.getStringExtra("lng0");
         if (myl!=null) mylng0 = Double.parseDouble(myl);
+        //Met le wptname
+        String wptname = intent.getStringExtra("nom");
+        dtxt = (TextView) findViewById(R.id.wptnomtxt);
+        dtxt.setText(wptname);
 
-        setContentView(R.layout.scan);
-        mContext=this;
+        //Récup la position en mém.
+        sharedPref = getBaseContext().getSharedPreferences("POSPREFS", MODE_PRIVATE);
+        compasok = sharedPref.getInt("compas", 1);
 
-        // initialize your android device sensor capabilities
-        mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-        // Sensor Type - 3 ,Sensor Name - Orientation  Sensor
-        Sensor magnetSensor = mSensorManager.getDefaultSensor(3);
-        mSensorManager.registerListener(this, magnetSensor , SensorManager.SENSOR_DELAY_NORMAL);
+        if (compasok>0) {
+            // initialize your android device sensor capabilities
+            mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+            // Sensor Type - 3 ,Sensor Name - Orientation  Sensor
+            Sensor magnetSensor = mSensorManager.getDefaultSensor(3);
+            mSensorManager.registerListener(this, magnetSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        }
 
         // on initialise le receiver de service/broadcast
         receiver = new MyReceiver();
@@ -58,11 +75,11 @@ public class Scan extends AppCompatActivity  implements SensorEventListener {
         super.onDestroy();
 
         //Arrete le Sensor listener
-        mSensorManager.unregisterListener(this);
-
+        if (compasok>0) mSensorManager.unregisterListener(this);
+        unregisterReceiver((BroadcastReceiver)receiver );
         finish();
-        Intent i = new Intent(mContext, MainActivity.class);
-        startActivity(i);
+  //      Intent i = new Intent(mContext, MainActivity.class);
+  //      startActivity(i);
     }
 
     //POUR GESTION MAGNETIC SENSOR
@@ -87,37 +104,55 @@ public class Scan extends AppCompatActivity  implements SensorEventListener {
         public static final String ACTION_RESP ="com.samblancat";
         @Override
         public void onReceive(Context context, Intent intent) {
-            String tp, la, lo, spd;
+            String tp, la, lo, alt;
             TextView dtxt;
+            dtxt = (TextView) findViewById(R.id.todisttxt);
 
-            //essaie de capter la Speed
-            spd = intent.getStringExtra("Rmc");
-            if (spd!=null) {
-                Double kmh =  1.852 * Double.parseDouble(spd);
-                spd = new DecimalFormat("##0.0").format(kmh);
+            //essaie de capter Altitude
+            alt = intent.getStringExtra("Alt");
+            if (alt!=null) {
                 dtxt = (TextView) findViewById(R.id.speedtxt);
-                dtxt.setText(spd+"kmh");
+                dtxt.setText(alt+" m");
             }
 
             la =  intent.getStringExtra("Lat");
             lo = intent.getStringExtra("Lon");
 
-            mylat =  (la!=null)?Double.parseDouble(la):0;
-            mylng = (lo!=null)?Double.parseDouble(lo):0;
+            try { mylat = Double.parseDouble(la); }
+            catch (Exception e) { mylat=0; }
+            try { mylng = Double.parseDouble(lo); }
+            catch (Exception e) { mylng=0; }
 
             if ((mylat!=0)&&(mylng!=0)) {
                 //Calc distance à mylat0/lng0
                 double dk = Math.pow(Math.abs(mylat - mylat0), 2) + Math.pow(Math.abs(mylng - mylng0), 2);
                 dk = 1000 * 111.12 * Math.sqrt(dk);
+                //Test état de l'approche
+                //On s'éloigne !
+                if ((arrived == 2) && (dk > 50)) {
+                    arrived = 3;
+                    dtxt.setTextColor(Color.BLUE);
+                }
+                //On est arrivé !
+                if ((arrived == 1) && (dk <= 50)) {
+                    arrived = 2;
+                    dtxt.setTextColor(Color.RED);
+                }
+                //En approche
+                if ((arrived == 0) && (dk > 50)) {
+                    arrived = 1;
+                    dtxt.setTextColor(Color.GREEN);
+                }
+                //test si en km?
                 if (dk < 1000) {
                     tp = new DecimalFormat("###0").format(dk);
-                    dtxt = (TextView) findViewById(R.id.todisttxt);
+                //    dtxt = (TextView) findViewById(R.id.todisttxt);
                     dtxt.setText(tp + "m");
                 } else {
                     // en km
                     dk = dk / 1000;
                     if (dk < 10)
-                        tp = new DecimalFormat("#0.0").format(dk);
+                        tp = new DecimalFormat("0.00").format(dk);
                     else
                         tp = new DecimalFormat("###0").format(dk);
                     dtxt = (TextView) findViewById(R.id.todisttxt);

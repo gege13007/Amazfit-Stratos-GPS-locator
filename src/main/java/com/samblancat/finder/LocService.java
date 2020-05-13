@@ -34,13 +34,10 @@ public class LocService extends Service {
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, listener);
         //Listener de NMEA
         locationManager.addNmeaListener(nmeaListener);
-        Log.e("Locservice:", "oncreate");
-
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.e("Locservice:", "onStartc");
         return Service.START_NOT_STICKY;
     }
 
@@ -60,7 +57,6 @@ public class LocService extends Service {
     //    Toast.makeText(this, "Bye Bye...", Toast.LENGTH_LONG).show();
         locationManager=null;
         listener=null;
-        Log.e("Locservice:", "ondestroy");
     }
 
 
@@ -96,18 +92,18 @@ public class LocService extends Service {
             String[] nmeaSplit = nmea.split(",");
             //Capte le nb de sats de GGA
             if (nmeaSplit[0].equalsIgnoreCase("$GPGSV")) {
-                String txt=nmeaSplit[2]+"/"+nmeaSplit[1]+"  "+nmeaSplit[3]+" sats";
+                String txt = nmeaSplit[3]+" sats";
                 Intent broadCastIntent = new Intent();
                 broadCastIntent.setAction("com.samblancat");
                 broadCastIntent.putExtra("Gsv", txt);
                 sendBroadcast(broadCastIntent);
             }
             //Capte la Speed de RMC
-            if (nmeaSplit[0].equalsIgnoreCase("$GPRMC")) {
-                String txt=nmeaSplit[7];
+            if (nmeaSplit[0].equalsIgnoreCase("$GPGGA")) {
+                String txt=nmeaSplit[9];
                 Intent broadCastIntent = new Intent();
                 broadCastIntent.setAction("com.samblancat");
-                broadCastIntent.putExtra("Rmc", txt);
+                broadCastIntent.putExtra("Alt", txt);
                 sendBroadcast(broadCastIntent);
             }
         }
