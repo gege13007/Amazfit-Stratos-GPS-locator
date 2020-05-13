@@ -18,16 +18,14 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_gravity="center"
-            android:background="@drawable/radar320b"
+            android:background="@drawable/radar_bleu"
             android:padding="0dp">
-
-            <ProgressBar
-                android:id="@+id/progressBar"
-                style="@android:style/Widget.DeviceDefault.Light.ProgressBar.Large"
+            <ImageView
+                android:id="@+id/faisceau"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:padding="10dp"
-                android:progressTint="#AC2727" />
+                android:src="@drawable/radar_beam"
+                android:visibility="visible" />
 
             <TextView
                 android:id="@+id/progBarText"
@@ -40,7 +38,7 @@
                 android:gravity="center"
                 android:text="Waiting GPS"
                 android:textColor="#FFEB40"
-                android:textSize="24sp"
+                android:textSize="20sp"
                 android:textStyle="bold"
                 android:typeface="normal" />
 
