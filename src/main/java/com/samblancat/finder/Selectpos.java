@@ -39,10 +39,11 @@ import javax.xml.parsers.ParserConfigurationException;
 public class Selectpos extends AppCompatActivity  {
     Context mContext;
     double mylat=0, mylng=0;
-    double mylat0=0, mylng0=0;
-    Integer nbWpts=0;
+    static double mylat0=0;
+    static double mylng0=0;
+    static Integer nbWpts=0;
     SharedPreferences sharedPref;
-    public String gpxini;
+    public static String gpxini;
     String wptname;
 
     @Override
@@ -142,7 +143,7 @@ public class Selectpos extends AppCompatActivity  {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Object Item = lv.getItemAtPosition(position);
                 wptname = Item.toString();
-                Toast.makeText(mContext, "Goto "+ wptname, Toast.LENGTH_LONG).show();
+            //    Toast.makeText(mContext, "Goto "+ wptname, Toast.LENGTH_LONG).show();
                 //   Log.d("TAG :", Item.toString());
                 mylat = gpxList.get(position).getLatitude();
                 mylng = gpxList.get(position).getLongitude();
@@ -300,10 +301,10 @@ public class Selectpos extends AppCompatActivity  {
                 }
             }
             br.close();
-        } catch (IOException e) {
+        } catch (IOException ignored) {
         }
         try { bw.close(); } catch (IOException e) { e.printStackTrace(); }
-        try { fw.close(); } catch (IOException e) { e.printStackTrace(); }
+        try { if (fw != null) fw.close(); } catch (IOException e) { e.printStackTrace(); }
 
         //efface le source
         gpx.delete();
@@ -314,13 +315,11 @@ public class Selectpos extends AppCompatActivity  {
         //Sync la Media-connection pour visu sur Windows usb
         MediaScannerConnection.scanFile(mContext,
                 new String[]{gpx.getAbsolutePath()}, null, null);
-        MediaScannerConnection.scanFile(mContext,
-                new String[]{gpx2.getAbsolutePath()}, null, null);
     }
 
 
     //Renvoie une Liste de nbWpts triés par distance croissante à (mylat0/mylng0)
-    private List<Location> decodeGPX(File file){
+    public static List<Location> decodeGPX(File file){
         //Liste des positions
         List<Location> list = new ArrayList<Location>();
         DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();

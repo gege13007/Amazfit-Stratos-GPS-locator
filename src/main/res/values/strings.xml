@@ -1,4 +1,10 @@
 <resources>
     <string name="app_name">GPS locator</string>
-    <string name="main_activity_content">Précision position</string>
+    <string name="main_activity_content">Waiting gps fix...</string>
+    <string name="selwpt_name">Goto WPT</string>
+    <string name="savwpt_name">Save to</string>
+    <string name="compass">Active compass</string>
+    <string name="autonexttxt">Auto next wpt</string>
+    <string name="nosave">Just GO</string>
+    <string name="oksave">Save</string>
 </resources>

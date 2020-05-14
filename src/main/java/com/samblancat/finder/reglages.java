@@ -10,16 +10,15 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
-import android.widget.ListView;
 import android.widget.Spinner;
-
 import java.io.File;
 
 public class reglages extends AppCompatActivity {
     Context mContext;
     SharedPreferences sharedPref;
     public String gpxini;
-    public CheckBox compchk;
+    public CheckBox compchk, autowptchk;
+    int ok=0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,26 +27,43 @@ public class reglages extends AppCompatActivity {
         setContentView(R.layout.reglage);
         mContext = this;
 
-        compchk = (CheckBox) findViewById(R.id.setcompasschk);
-
-        //Reprend réglage compas & fichier GPX de base
-        sharedPref = getBaseContext().getSharedPreferences("POSPREFS", MODE_PRIVATE);
-        if (sharedPref.getInt("compas", 1) > 0) compchk.setChecked(true);
-        else compchk.setChecked(false);
-
         //Reprend le Gpx de base
+        sharedPref = getBaseContext().getSharedPreferences("POSPREFS", MODE_PRIVATE);
         gpxini=sharedPref.getString("gpxini","gpxlocator.gpx");
 
+        compchk = (CheckBox) findViewById(R.id.setcompasschk);
+        autowptchk = (CheckBox) findViewById(R.id.autonextchk);
+
+        //Set etat init du 'compas activé'
+        try { ok=sharedPref.getInt("compas", 1); } catch (Exception e) { e.printStackTrace(); }
+        if (ok > 0) compchk.setChecked(true); else compchk.setChecked(false);
+
+        //Set état init de 'auto next wpt'
+        try { ok=sharedPref.getInt("autonext", 1); } catch (Exception e) { e.printStackTrace(); }
+        if (ok > 0) autowptchk.setChecked(true); else autowptchk.setChecked(false);
+
+        //Set the 2 click chk listeners
         compchk.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Integer ok;
-                if (((CheckBox) v).isChecked()) ok = 1;
-                else ok = 0;
-                //Sauve la Position Départ !
-                SharedPreferences.Editor editor = sharedPref.edit();
-                editor.putInt("compas", ok);
-                editor.apply();
+            if (((CheckBox) v).isChecked()) ok = 1;
+            else ok = 0;
+            //Sauve la Position Départ !
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putInt("compas", ok);
+            editor.apply();
+            }
+        });
+
+        autowptchk.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            if (((CheckBox) v).isChecked()) ok = 1;
+            else ok = 0;
+            //Sauve la Position Départ !
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putInt("autonext", ok);
+            editor.apply();
             }
         });
 

@@ -49,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
         intentFilter.addAction(BROADCAST_ACTION);
         registerReceiver(receiver, intentFilter);
 
+        //Fait clignoter "Waiting pos" tant que pas de fix
         Animation anim = new AlphaAnimation(0.0f, 1.0f);
         anim.setDuration(250);  // blinking time
         anim.setStartOffset(100);
