@@ -40,12 +40,9 @@ Change log
           Important Fix !!! Impossible to kill the entire process (sinking the battery). No explication. Find a solution with ' android.os.Process.killProcess(android.os.Process.myPid());' in OnDestroy().
           RMC speed added on the scan screen.
          
-2/5/2020  Problem with onDestroy. Bug fix with unregister.Sensormanager.listener...
+14/5/2020  Version 2 , with GPX file compatibility, and 'autonext' waypoint detection.
 
 
 What's left to do ?
 ------------------
-==> Implement a simple selection system for labels of multiples places...
-
-==> Why not a small Golf gps with xml file export ???
-
+==> Implement a simple cartography display of the tracks.
