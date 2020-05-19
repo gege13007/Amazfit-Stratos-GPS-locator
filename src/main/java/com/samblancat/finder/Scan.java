@@ -2,6 +2,7 @@ package com.samblancat.finder;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -13,6 +14,7 @@ import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -20,9 +22,10 @@ import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 import java.io.File;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.List;
 
 import static com.samblancat.finder.Selectpos.decodeGPX;
@@ -37,7 +40,9 @@ public class Scan extends AppCompatActivity implements SensorEventListener {
     double mylat0=0, mylng0=0;
     String wptname;
     double cap, cap0, compas=0;
+    //Flag si compas bouge
     Integer compasok=1;
+    //Flag si next wpt auto
     Integer autonext=0, counter=0;
     //Flag état de la recherche 0:rien,  1:scan rapprochement, 2:proche arrivé, 3:s'éloigne
     Integer arrived=0;
@@ -50,14 +55,15 @@ public class Scan extends AppCompatActivity implements SensorEventListener {
         setContentView(R.layout.scan);
         mContext=this;
 
+        //Récup la config.
+        sharedPref = getBaseContext().getSharedPreferences("POSPREFS", MODE_PRIVATE);
+        compasok = sharedPref.getInt("compas", 1);
+        autonext = sharedPref.getInt("autonext", 0);
+
         //Retrouve Position de Destination
-        Intent intent = getIntent();
-        String myl = intent.getStringExtra("lat0");
-        if (myl!=null) mylat0 = Double.parseDouble(myl);
-        myl = intent.getStringExtra("lng0");
-        if (myl!=null) mylng0 = Double.parseDouble(myl);
-        //Met le wptname
-        wptname = intent.getStringExtra("nom");
+        mylat0 = sharedPref.getFloat("lat0", (float) mylat);
+        mylng0 = sharedPref.getFloat("lng0", (float) mylng);
+        wptname = sharedPref.getString("nom"," ");
         dtxt = (TextView) findViewById(R.id.wptnomtxt);
         dtxt.setText(wptname);
 
@@ -68,11 +74,6 @@ public class Scan extends AppCompatActivity implements SensorEventListener {
         anim.setRepeatMode(Animation.REVERSE);
         anim.setRepeatCount(Animation.INFINITE);
         dtxt.startAnimation(anim);
-
-        //Récup la position en mém.
-        sharedPref = getBaseContext().getSharedPreferences("POSPREFS", MODE_PRIVATE);
-        compasok = sharedPref.getInt("compas", 1);
-        autonext = sharedPref.getInt("autonext", 0);
 
         if (compasok>0) {
             // initialize your android device sensor capabilities
@@ -93,11 +94,32 @@ public class Scan extends AppCompatActivity implements SensorEventListener {
     protected void onDestroy() {
         // TODO Auto-generated method stub
         super.onDestroy();
-
         //Arrete le Sensor listener
         if (compasok>0) mSensorManager.unregisterListener(this);
         unregisterReceiver((BroadcastReceiver)receiver );
-        finish();
+    }
+
+    @Override
+    protected void onPause() {
+        // TODO Auto-generated method stub
+        super.onPause();
+        //Arrete le Sensor listener
+        if (compasok>0) mSensorManager.unregisterListener(this);
+        Log.d("TAG : ", "onPause: ");
+    }
+
+    @Override
+    protected void onResume() {
+        // TODO Auto-generated method stub
+        super.onResume();
+        if (compasok>0) {
+            // initialize your android device sensor capabilities
+            mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+            // Sensor Type - 3 ,Sensor Name - Orientation  Sensor
+            Sensor magnetSensor = mSensorManager.getDefaultSensor(3);
+            mSensorManager.registerListener(this, magnetSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        }
+        Log.d("TAG : ", "onResume");
     }
 
     //POUR GESTION MAGNETIC SENSOR
@@ -111,30 +133,30 @@ public class Scan extends AppCompatActivity implements SensorEventListener {
         //Angle inverse pour redresser la Rosace !
         imgview.setRotation((float)-compas);
     }
+
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
         // not in use
     }
 
-    public void getNextWpt() {
+    public Location getNextWpt(Double lat, Double lng) {
         // Extrait la liste Array des 'name'
         //Reprend le Gpx de base
         sharedPref = getBaseContext().getSharedPreferences("POSPREFS", MODE_PRIVATE);
         String path0 = Environment.getExternalStorageDirectory().toString()+"/gpxdata";
         String path = path0 + "/" + sharedPref.getString("gpxini","gpxlocator.gpx");
         File gpx = new File(path);
-        final List<Location> gpxList = decodeGPX(gpx);        // liste des Pos des Wpts
+        final List<Location> gpxList = decodeGPX(gpx, lat, lng);        // liste des Pos des Wpts
         //Si Aucun Waypoints -> efface - recree
         if (gpxList.size() > 1) {
             //Va chercher le wptname qui suit l'actuel
             for (int nn = 0; nn < -1+gpxList.size(); nn++) {
                 String tt = ((Location) gpxList.get(nn)).getProvider();
-                if (wptname.equals(tt)) {
-                    tt = ((Location) gpxList.get(nn+1)).getProvider();
-                    Toast.makeText(mContext, "Goto "+tt, Toast.LENGTH_LONG).show();
-                }
+                if (wptname.equals(tt))
+                    return ((Location) gpxList.get(nn+1));
             }
         }
+        return(null);
     }
 
     //Attention ! Les données arrive ici par paquets : un coup du gsv,
@@ -143,16 +165,36 @@ public class Scan extends AppCompatActivity implements SensorEventListener {
         public static final String ACTION_RESP ="com.samblancat";
         @Override
         public void onReceive(Context context, Intent intent) {
-            String tp, la, lo, alt;
-            TextView dtxt;
-            dtxt = (TextView) findViewById(R.id.todisttxt);
+            String tp, la, lo, alt, fix;
+            Integer satok;
+
+            TextView  dtxt = (TextView) findViewById(R.id.todisttxt);
+            TextView atxt = (TextView) findViewById(R.id.speedtxt);
+            ImageView imb = (ImageView)findViewById(R.id.boussole);
+
+            //write your code here to be executed after 1 second
+            TextView timtxt = (TextView) findViewById(R.id.timetxt);
+            Calendar c = Calendar.getInstance();
+            SimpleDateFormat df = new SimpleDateFormat("HH:mm");
+            String formattime = df.format(c.getTime());
+            timtxt.setText(formattime);
+
+            //Capte Qualité
+            fix = intent.getStringExtra("Fix");
+            if (fix!=null) {
+                try { satok = Integer.valueOf(fix);
+                } catch (Exception e) { satok = 0; }
+                if (satok == 0) {
+                    dtxt.setText("-.-");
+                    atxt.setText("Alt-");
+                    imb.setVisibility(View.INVISIBLE);
+                    return;
+                }
+            }
 
             //essaie de capter Altitude
             alt = intent.getStringExtra("Alt");
-            if (alt!=null) {
-                TextView atxt = (TextView) findViewById(R.id.speedtxt);
-                atxt.setText(alt+" m");
-            }
+            if (alt!=null) atxt.setText(alt+" m");
 
             la =  intent.getStringExtra("Lat");
             lo = intent.getStringExtra("Lon");
@@ -170,21 +212,51 @@ public class Scan extends AppCompatActivity implements SensorEventListener {
                 //Calc distance à mylat0/lng0
                 double dk = Math.pow(Math.abs(mylat - mylat0), 2) + Math.pow(Math.abs(mylng - mylng0), 2);
                 dk = 1000 * 111.12 * Math.sqrt(dk);
-                //Test état de l'approche
+                //--------- Test état de l'approche ---------
                 //Si On s'éloigne ?
-                if ((arrived == 2) && (dk > 30)) {
+                if ((arrived == 2) && (dk > 25)) {
                     //Ajoute un peu d'inertie
-                    if (counter++ > 10) {
+                    if (counter++ > 5) {
                         counter = 0;
+                        //on est arrivé et on s'éloigne
                         arrived = 3;
                         dtxt.setTextColor(Color.GREEN);
-                        if (autonext > 0) getNextWpt();
+                        if (autonext > 0) {
+                            //Va deja chercher le next wpt !
+                            final Location nloc = getNextWpt(mylat, mylng);
+                            final String wptname2 = nloc.getProvider();
+                            //Demande confirmation
+                            AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+                            builder.setTitle("Goto next Wpt ?");
+                            builder.setCancelable(false);
+                            builder.setMessage(wptname2);
+                            builder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                mylat0 = nloc.getLatitude();
+                                mylng0 = nloc.getLongitude();   // !!!!!
+                                //Met le wptname
+                                wptname = wptname2;
+                                TextView ntxt = (TextView) findViewById(R.id.wptnomtxt);
+                                ntxt.setText(wptname);
+                                //Raz flag en approche
+                                arrived = 1;
+                                }
+                            });
+                            builder.setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                //Raz flag en approche
+                                arrived = 1;
+                                }
+                            });
+                            builder.setIcon(android.R.drawable.ic_dialog_alert);
+                            builder.show();
+                        }
                     }
                 }
                 //Si on est arrivé ?
                 if ((arrived == 1) && (dk <= 25)) {
                     //Ajoute un peu d'inertie
-                    if (counter++>10) {
+                    if (counter++>5) {
                         counter=0;
                         arrived = 2;
                         dtxt.setTextColor(Color.RED);
@@ -226,11 +298,10 @@ public class Scan extends AppCompatActivity implements SensorEventListener {
                 cap0 = cap;
 
                 //Tourne la flèche
-                ImageView imgview;
-                imgview = (ImageView) findViewById(R.id.boussole);
                 //Retranche (retour arrière) le cap Compas
                 cap -= compas;
-                imgview.setRotation((float) cap);
+                imb.setRotation((float) cap);
+                imb.setVisibility(View.VISIBLE);
             }
         }
     };

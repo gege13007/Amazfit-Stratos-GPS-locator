@@ -66,6 +66,7 @@
                 android:onClick="closecmd" />
 
             <ImageButton
+                android:id="@+id/gotocmd"
                 android:layout_width="54dp"
                 android:layout_height="54dp"
                 android:background="@drawable/finder32"

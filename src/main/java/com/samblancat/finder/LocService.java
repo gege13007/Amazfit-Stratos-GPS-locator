@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.Service;
 import android.content.Intent;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.GpsStatus;
 import android.location.Location;
@@ -20,6 +21,7 @@ public class LocService extends Service {
     public static final String BROADCAST_ACTION = "com.samblancat";
     public LocationManager locationManager;
     public MyLocationListener listener;
+    SharedPreferences sharedPref;
     double lat, lon;
 
     @Override
@@ -34,6 +36,8 @@ public class LocService extends Service {
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, listener);
         //Listener de NMEA
         locationManager.addNmeaListener(nmeaListener);
+
+        sharedPref = getBaseContext().getSharedPreferences("POSPREFS", MODE_PRIVATE);
     }
 
     @Override
@@ -53,10 +57,6 @@ public class LocService extends Service {
         locationManager.removeUpdates(listener);
         //Remove NMEA listener
         locationManager.removeNmeaListener(nmeaListener);
-
-    //    Toast.makeText(this, "Bye Bye...", Toast.LENGTH_LONG).show();
-        locationManager=null;
-        listener=null;
     }
 
 
@@ -71,6 +71,12 @@ public class LocService extends Service {
             lon = loc.getLongitude();
             broadCastIntent.putExtra("Lon", Double.toString(lon));
             sendBroadcast(broadCastIntent);
+
+            //Sauve la Position Voulue et Go sur SCAN !
+            SharedPreferences.Editor editor = sharedPref.edit();
+            editor.putFloat("dlat", (float) lat);
+            editor.putFloat("dlng", (float) lon);
+            editor.apply();
         }
 
         @Override
@@ -92,18 +98,31 @@ public class LocService extends Service {
             String[] nmeaSplit = nmea.split(",");
             //Capte le nb de sats de GGA
             if (nmeaSplit[0].equalsIgnoreCase("$GPGSV")) {
-                String txt = nmeaSplit[3]+" sats";
+                String txt=nmeaSplit[3];
                 Intent broadCastIntent = new Intent();
                 broadCastIntent.setAction("com.samblancat");
-                broadCastIntent.putExtra("Gsv", txt);
+                broadCastIntent.putExtra("Sat", txt);
                 sendBroadcast(broadCastIntent);
             }
-            //Capte la Speed de RMC
+
+            //Capte la Speed de GGA
             if (nmeaSplit[0].equalsIgnoreCase("$GPGGA")) {
-                String txt=nmeaSplit[9];
+
                 Intent broadCastIntent = new Intent();
                 broadCastIntent.setAction("com.samblancat");
+
+                //Extrait Fix (0=no 1=ok 2=dgps)
+                String txt=nmeaSplit[6];
+                broadCastIntent.putExtra("Fix", txt);
+
+                //Extrait HDOP
+                txt=nmeaSplit[8];
+                broadCastIntent.putExtra("Hdop", txt);
+
+                //Extrait Altitude
+                txt=nmeaSplit[9];
                 broadCastIntent.putExtra("Alt", txt);
+
                 sendBroadcast(broadCastIntent);
             }
         }

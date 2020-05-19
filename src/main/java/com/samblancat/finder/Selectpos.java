@@ -58,12 +58,9 @@ public class Selectpos extends AppCompatActivity  {
         sharedPref = getBaseContext().getSharedPreferences("POSPREFS", MODE_PRIVATE);
         gpxini = sharedPref.getString("gpxini","gpxlocator.gpx");
 
-        //Retrouve Position courante pour tri / distances
-        Intent intent = getIntent();
-        String myl = intent.getStringExtra("lat0");
-        if (myl!=null) mylat0 = Double.parseDouble(myl);
-        myl = intent.getStringExtra("lng0");
-        if (myl!=null) mylng0 = Double.parseDouble(myl);
+        //Retrouve last Position courante pour tri / distances
+        mylat0 = sharedPref.getFloat("dlat", (float) mylat);
+        mylng0 = sharedPref.getFloat("dlng", (float) mylng);
 
   //      mylat0=43.20; mylng0=5.30;     // TEST ONLY !!!
    //     LireGpx();
@@ -77,7 +74,7 @@ public class Selectpos extends AppCompatActivity  {
             CreerGpx();
         }
         // Extrait la liste Array des 'name'
-        final List<Location> gpxList = decodeGPX(gpxFile);        // liste des Pos des Wpts
+        final List<Location> gpxList = decodeGPX(gpxFile, mylat0, mylng0);        // liste des Pos des Wpts
         //Si Aucun Waypoints -> efface - recree
         if (nbWpts < 1) {
             Toast.makeText(mContext, "No waypoints !", Toast.LENGTH_LONG).show();
@@ -111,7 +108,7 @@ public class Selectpos extends AppCompatActivity  {
                             // Efface le wpt du meme nom
                             DeleteWptGPX(wptname);
                             // Extrait la liste Array des 'name'
-                            final List<Location> gpxList = decodeGPX(gpxFile);        // liste des Pos des Wpts
+                            final List<Location> gpxList = decodeGPX(gpxFile, mylat0, mylng0);        // liste des Pos des Wpts
                             //Si Aucun Waypoints -> efface - recree
                             if (nbWpts < 1) {
                                 Toast.makeText(mContext, "No waypoints !", Toast.LENGTH_LONG).show();
@@ -143,16 +140,17 @@ public class Selectpos extends AppCompatActivity  {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Object Item = lv.getItemAtPosition(position);
                 wptname = Item.toString();
-            //    Toast.makeText(mContext, "Goto "+ wptname, Toast.LENGTH_LONG).show();
                 //   Log.d("TAG :", Item.toString());
                 mylat = gpxList.get(position).getLatitude();
                 mylng = gpxList.get(position).getLongitude();
                 //Sauve la Position Voulue et Go sur SCAN !
-                Intent intent = new Intent(Selectpos.this, Scan.class);
-                intent.putExtra("lat0", String.valueOf(mylat));
-                intent.putExtra("lng0", String.valueOf(mylng));
-                intent.putExtra("nom", String.valueOf(wptname));
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.putFloat("lat0", (float) mylat);
+                editor.putFloat("lng0", (float) mylng);
+                editor.putString("nom", wptname);
+                editor.apply();
                 //Lance le Scanning
+                Intent intent = new Intent(Selectpos.this, Scan.class);
                 startActivity(intent);
                 finish();
             }
@@ -218,12 +216,11 @@ public class Selectpos extends AppCompatActivity  {
         Log.d("GPX :", "delete ok");
     }
 
-
     public void LireGpx() {
         String path0 = Environment.getExternalStorageDirectory().toString()+"/gpxdata";
         String path = path0 + "/" + gpxini;
         File gpx = new File(path);
-        Log.d("Rd :", "Read "+gpx.toString());
+   //     Log.d("Rd :", "Read "+gpx.toString());
         try {
             BufferedReader br = new BufferedReader(new FileReader(gpx));
             String line;
@@ -240,7 +237,7 @@ public class Selectpos extends AppCompatActivity  {
         String path0 = Environment.getExternalStorageDirectory().toString()+"/gpxdata";
         String path = path0 + "/" + gpxini;
         File gpx = new File(path);
-        String path2 = path0 + "/" + gpxini;
+        String path2 = path0 + "/gpslocator.tmp";
         File gpx2 = new File(path2);
 
         String nametofind = "<name>"+nom+"</name>";
@@ -315,11 +312,13 @@ public class Selectpos extends AppCompatActivity  {
         //Sync la Media-connection pour visu sur Windows usb
         MediaScannerConnection.scanFile(mContext,
                 new String[]{gpx.getAbsolutePath()}, null, null);
+        MediaScannerConnection.scanFile(mContext,
+                new String[]{gpx2.getAbsolutePath()}, null, null);
     }
 
 
-    //Renvoie une Liste de nbWpts triés par distance croissante à (mylat0/mylng0)
-    public static List<Location> decodeGPX(File file){
+    //Renvoie une Liste de nbWpts triés par distance croissante à (lat0/lng0)
+    public static List<Location> decodeGPX(File file, Double lat0, Double lng0) {
         //Liste des positions
         List<Location> list = new ArrayList<Location>();
         DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
@@ -339,9 +338,9 @@ public class Selectpos extends AppCompatActivity  {
                 double newLat_double = Double.parseDouble(newLat);
                 String newLon = attributes.getNamedItem("lon").getTextContent();
                 double newLon_double = Double.parseDouble(newLon);
-                //Calc pseudo distance à mylat0/mylng0
-                Double dist1=Math.pow(Math.abs(mylat0-newLat_double),2);
-                Double dist2=Math.pow(Math.abs(mylng0-newLon_double),2);
+                //Calc pseudo distance à lat0/lng0
+                Double dist1=Math.pow(Math.abs(lat0-newLat_double),2);
+                Double dist2=Math.pow(Math.abs(lng0-newLon_double),2);
                 float distance = (float) Math.sqrt(dist1 + dist2);
                 //strip les champs inclus au trkpt
                 NodeList nList = node.getChildNodes();
@@ -389,6 +388,13 @@ public class Selectpos extends AppCompatActivity  {
             min0=min;
             list2.add(list.get(index));
         }
+
+        //Debug only
+        for(j=0; j<list2.size(); j++) {
+            String tt = ((Location) list2.get(j)).getProvider();
+            Log.d("nomTrie : ", Integer.toString(j)+" "+tt);
+        }
+
         return list2;
     }
 

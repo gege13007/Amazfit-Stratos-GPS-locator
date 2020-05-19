@@ -25,26 +25,41 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:src="@drawable/arrow"
-            android:visibility="visible" />
+            android:visibility="invisible" />
+
+        <TextView
+            android:id="@+id/timetxt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="54dp"
+            android:gravity="center"
+            android:text="16:22"
+            android:textColor="@android:color/holo_green_light"
+            android:textSize="14sp"
+            android:typeface="normal" />
 
         <TextView
             android:id="@+id/wptnomtxt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@id/timetxt"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="67dp"
+            android:layout_marginTop="8dp"
             android:gravity="center"
-            android:text="goto wpt"
+            android:text="wpt"
             android:textColor="@android:color/holo_green_light"
-            android:textSize="13sp"
+            android:textSize="14sp"
+            android:textStyle="bold"
             android:typeface="normal" />
+
         <TextView
             android:id="@+id/todisttxt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@id/wptnomtxt"
             android:layout_centerHorizontal="true"
             android:gravity="center"
-            android:layout_below="@id/wptnomtxt"
             android:text="- m"
             android:textColor="@android:color/holo_green_light"
             android:textSize="30sp"
@@ -57,7 +72,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/todisttxt"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="2dp"
             android:gravity="center"
             android:text="alt"
             android:textColor="@android:color/holo_green_light"

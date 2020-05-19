@@ -36,7 +36,7 @@ public class GpsSetup extends AppCompatActivity {
         mContext.startService(I);
 
         //Lance le Countdown de 10sec minimum avant lancement main...
-        new CountDownTimer(15000, 40) {
+        new CountDownTimer(18000, 50) {
             public void onTick(long millisUntilFinished) {
                 TextView t=findViewById(R.id.progBarText);
                 int sec=Math.round(millisUntilFinished / 1000);
@@ -92,9 +92,9 @@ public class GpsSetup extends AppCompatActivity {
         private Intent i;
         @Override
         public void onReceive(Context context, Intent intent) {
-            gsv = intent.getStringExtra("Gsv");
+            gsv = intent.getStringExtra("Sat");
             TextView txt = findViewById(R.id.gsvtxt);
-            txt.setText(gsv);
+            txt.setText(gsv+" sats");
 
             String la =  intent.getStringExtra("Lat");
             String lo = intent.getStringExtra("Lon");
