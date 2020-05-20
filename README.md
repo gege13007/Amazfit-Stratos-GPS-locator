@@ -1,7 +1,7 @@
 # Android Wear Amazfit GPS Direction Finder & GPX reader
 Simple &amp; effective GPS locator app for Amazfit Xiaomi android wear
 ------------------------------------------------------------------------------
-Hello guys, after a long work ( ͠° ͟ʖ ͡°) on Android Studio, here is my second version of simple GPS locator for Xiaomi Wear Android  Amazfit Stratos 2 (and others?).
+Hello guys, after a long work and first experience with Android Studio, here is my second version of simple GPS locator for Wear Android  . The app was tested on my Xiaomi Amazfit Stratos 2 (but must be fine on many others !).
 This app was designed with the idea of doing like a Golf Gps wear.
 This second version allows you to :
 - select a GPX file from your gpsdata directory,
@@ -40,7 +40,7 @@ To enable or not the automatic waypoint suggestion.
 
 How this works
 --------------
-The first activity (gpsetup) launches a service who assumes the background task of getting GPS location (with a locationManager and locationListener). This avoid to stop and re-run the gps updates between each activities, and assures that just ONE first fix delay is necessary when you start the app.
+The first activity launches a service who assumes the background task of getting GPS location (with a locationManager and locationListener). This avoid to stop and re-run the gps updates between each activities, and assures that just ONE first fix delay is necessary when you start the app.
 The lat & long are broadcasted to the other activities with 'sendBroadcast & broadcastReceiver'.
 The first screen uses a 'nmealistener' to get & display a snapshot of the $GPGSV & GPGGA frames.
 The location service and its broadcats is only stopped, when the app is destroyed (if not - your battery don't last so long)...
