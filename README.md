@@ -7,6 +7,7 @@ This second version allows you to :
 - select a GPX file from your gpsdata directory,
 - select a Waypoint and track the distance/direction/altitude (the compass follow the North or not)
 - store your local position on a GPX file
+- remove a waypoint from your GPX file.
 - just to track a return direction to your start point (without GPX)...
 - automatic suggestion of the next nearest GPX waypoint (the next Golf hole ?).
 
