@@ -14,13 +14,13 @@ This could be useful if you don't want to forget your car on a parking ! or if y
 
 Here's the first gps startup screen. This animation just appear for 15 seconds showing the number of satellites in view.
 
-<center><img src="/1-startscreen.png" alt="gps startup fix"/></center>
+<center><img src="/1-startscreen.jpg" alt="gps startup fix"/></center>
 
 The main menu appears even if the position is not ok. So it's possible to change the settings, or to find and select a waypoint to track.
 From up left to right : first button start the settings, the second is for select a Gps waypoint from a gpx file.
 Third (bottom) is to exit, and the arrow is to start the tracking radar. Storing the current position or not.
 
-<center><img src="/2-main-screen.png" alt="gps main menu amazfit"/></center>
+<center><img src="/2-main-screen.jpg" alt="gps main menu amazfit"/></center>
 
 In radar operation - the distance displayed on the center - the compass and direction rotates when you move.
 
