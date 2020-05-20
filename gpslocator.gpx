@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<gpx xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/11.xsd"
+xmlns="http://www.topografix.com/GPX/1/1"
+xmlns:ns3="http://www.garmin.com/xmlschemas/TrackPointExtension/v1"
+xmlns:ns2="http://www.garmin.com/xmlschemas/GpxExtensions/v3"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xmlns:ns1="http://www.cluetrust.com/XML/GPXDATA/1/0"
+creator="Huami Amazfit Sports Watch" version="1.1">
+<metadata>
+<name>Amazfit GPS Locator</name>
+<author>
+<name>Samblancat G</name>
+</author>
+<time>2020-05-05T10:52:19Z</time>
+</metadata>
+<trk>
+<name>GPS Locator</name>
+<trkseg>
+<trkpt lat="43.526759" lon="5.459181">
+<ele>120</ele>
+<time>2020-05-08T23:18:44Z</time>
+<name>Travail-Aix</name>
+</trkpt>
+<trkpt lat="43.458132" lon="5.349380">
+<ele>100</ele>
+<time>2019-07-30T08:53:57Z</time>
+<name>Trou 1</name>
+</trkpt>
+<trkpt lat="43.454074" lon="5.350843">
+<ele>100</ele>
+<time>2019-07-30T08:54:01Z</time>
+<name>Trou 2</name>
+</trkpt>
+<trkpt lat="64.137" lon="-21.90">
+<ele>0.0</ele>
+<time>2020-05-08T23:49:42Z</time>
+<name>Reykjavik</name>
+</trkpt>
+<trkpt lat="43.280184999999996" lon="5.312551666666667">
+<ele>0.0</ele>
+<time>2020-05-12T17:38:58Z</time>
+<name>Frioul-Bato</name>
+</trkpt>
+<trkpt lat="43.286316" lon="5.354957">
+<ele>50.0</ele>
+<time>2020-05-13T17:38:58Z</time>
+<name>Recyclage</name>
+</trkpt>
+<trkpt lat="43.285888" lon="5.356545">
+<ele>50.0</ele>
+<time>2020-05-13T17:38:58Z</time>
+<name>Bar-Tabac</name>
+</trkpt>
+</trkseg>
+</trk>
+</gpx>

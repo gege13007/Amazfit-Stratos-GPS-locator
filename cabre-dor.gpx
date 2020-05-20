@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<gpx xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/11.xsd"
+xmlns="http://www.topografix.com/GPX/1/1"
+xmlns:ns3="http://www.garmin.com/xmlschemas/TrackPointExtension/v1"
+xmlns:ns2="http://www.garmin.com/xmlschemas/GpxExtensions/v3"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xmlns:ns1="http://www.cluetrust.com/XML/GPXDATA/1/0"
+creator="Huami Amazfit Sports Watch" version="1.1">
+<metadata>
+<name>Amazfit GPS Locator</name>
+<author>
+<name>Samblancat G</name>
+</author>
+<time>2020-05-05T10:52:19Z</time>
+</metadata>
+<trk>
+<name>Golf CABRE D'OR</name>
+<trkseg>
+<trkpt lat="43.458132" lon="5.349380">
+<ele>100</ele>
+<time>2019-07-30T08:53:57Z</time>
+<name>Trou 1</name>
+</trkpt>
+<trkpt lat="43.454074" lon="5.350843">
+<ele>100</ele>
+<time>2019-07-30T08:54:01Z</time>
+<name>Trou 2</name>
+</trkpt>
+<trkpt lat="43.454693" lon="5.355584">
+<ele>0.0</ele>
+<time>2020-05-08T23:49:42Z</time>
+<name>Trou 3</name>
+</trkpt>
+<trkpt lat="43.451472" lon="5.356505">
+<ele>0.0</ele>
+<time>2020-05-12T17:38:58Z</time>
+<name>Trou 4</name>
+</trkpt>
+<trkpt lat="43.453931" lon="5.355918">
+<ele>50.0</ele>
+<time>2020-05-13T17:38:58Z</time>
+<name>Trou 5</name>
+</trkpt>
+<trkpt lat="43.451841" lon="5.357638">
+<ele>50.0</ele>
+<time>2020-05-13T17:38:58Z</time>
+<name>Trou 6</name>
+</trkpt>
+<trkpt lat="43.448964" lon="5.357081">
+<ele>0.0</ele>
+<time>2020-05-19T18:24:15Z</time>
+<name>Trou 7</name>
+</trkpt>
+<trkpt lat="43.449765" lon="5.354765">
+<ele>0.0</ele>
+<time>2020-05-19T18:24:15Z</time>
+<name>Trou 8</name>
+</trkpt>
+<trkpt lat="43.451910" lon="5.351147">
+<ele>0.0</ele>
+<time>2020-05-19T18:24:15Z</time>
+<name>Trou 9</name>
+</trkpt>
+<trkpt lat="43.450303" lon="5.354690">
+<ele>0.0</ele>
+<time>2020-05-19T18:24:15Z</time>
+<name>Trou 10</name>
+</trkpt>
+<trkpt lat="43.452130" lon="5.351692">
+<ele>0.0</ele>
+<time>2020-05-19T18:24:15Z</time>
+<name>Trou 11</name>
+</trkpt>
+</trkseg>
+</trk>
+</gpx>
