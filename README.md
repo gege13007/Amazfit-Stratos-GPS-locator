@@ -20,11 +20,22 @@ The main menu appears even if the position is not ok. So it's possible to change
 From up left to right : first button start the settings, the second is for select a Gps waypoint from a gpx file.
 Third (bottom) is to exit, and the arrow is to start the tracking radar. Storing the current position or not.
 
-<center><img src="/2-main-screen.jpg" alt="gps main menu amazfit"/></center>
+<center><img src="/2-main-screen.jpg" alt="gps main menu"/></center>
+
+When you click on select waypoint, the listview shows all gpx points sorted by the distance to your position.
+A 'Long Click' on a point allows you to remove the point. A 'simple click' select your destination.
+
+<center><img src="/3-wpt-liste.jpg" alt="liste waypoint gps menu"/></center>
 
 In radar operation - the distance displayed on the center - the compass and direction rotates when you move.
 
-<center><img src="/gpsapp_171818537.jpg" alt="gps radar stratos 2"/></center>
+<center><img src="/5-scann.jpg" alt="gps radar stratos 2"/></center>
+
+The settings view, allows to change the gpx file.
+To enable or not, the magnetic sensor and compass mooving (not good for the battery!).
+To enable or not the automatic waypoint suggestion.
+
+<center><img src="/4-settings.jpg" alt="gps radar stratos 2"/></center>
 
 How this works
 --------------
