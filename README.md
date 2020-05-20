@@ -28,7 +28,7 @@ A 'Long Click' on a point allows you to remove the point. A 'simple click' selec
 
 <center><img src="/3-wpt-liste.jpg" alt="liste waypoint gps menu"/></center>
 
-In radar operation - the distance displayed on the center - the compass and direction rotates when you move.
+In radar operation - the time & distance & altitude are displayed on the center - the compass and direction rotates when you move.
 
 <center><img src="/5-scann.jpg" alt="gps radar stratos 2"/></center>
 
