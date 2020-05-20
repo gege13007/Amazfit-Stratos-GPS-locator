@@ -14,17 +14,13 @@ This could be useful if you don't want to forget your car on a parking ! or if y
 
 Here's the first gps startup screen. This animation just appear for 15 seconds showing the number of satellites in view.
 
-<center><img src="/1-startscreen.jpg" alt="gps startup fix"/></center>
+<center><img src="/1-startscreen.png" alt="gps startup fix"/></center>
 
-The main menu appears, even the position is not ok. So it's possible to change the settings, or to find and select a waypoint to track.
-From up left to right : first button save the current position on the shared preferences of the wear.
-Second button recall a previous position and go to the gps radar.
-Third (bottom) is to exit, and the arrow is immediate radar return on the current position without save.
+The main menu appears even if the position is not ok. So it's possible to change the settings, or to find and select a waypoint to track.
+From up left to right : first button start the settings, the second is for select a Gps waypoint from a gpx file.
+Third (bottom) is to exit, and the arrow is to start the tracking radar. Storing the current position or not.
 
-(** a small green button is hidden on the right - this launches a test of magnetic sensors).
-
-<center><img src="/2-main-screen.jpg" alt="gps main menu amazfit"/></center>
-
+<center><img src="/2-main-screen.png" alt="gps main menu amazfit"/></center>
 
 In radar operation - the distance displayed on the center - the compass and direction rotates when you move.
 
@@ -34,7 +30,7 @@ How this works
 --------------
 The first activity (gpsetup) launches a service who assumes the background task of getting GPS location (with a locationManager and locationListener). This avoid to stop and re-run the gps updates between each activities, and assures that just ONE first fix delay is necessary when you start the app.
 The lat & long are broadcasted to the other activities with 'sendBroadcast & broadcastReceiver'.
-The first screen uses a 'nmealistener' to get & display a snapshot of the $GPGSV frames.
+The first screen uses a 'nmealistener' to get & display a snapshot of the $GPGSV & GPGGA frames.
 The location service and its broadcats is only stopped, when the app is destroyed (if not - your battery don't last so long)...
 We use the 'magnetic orientation sensor type3' to rotate the compass graduations, with a sensorManager.registerListener.
 
