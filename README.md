@@ -1,23 +1,29 @@
-# Android Wear Amazfit GPS Direction Finder
+# Android Wear Amazfit GPS Direction Finder & GPX reader
 Simple &amp; effective GPS locator app for Amazfit Xiaomi android wear
 ------------------------------------------------------------------------------
-Hello guys, after a very hard work ( ͠° ͟ʖ ͡°) on Android Studio, here is my first version of a simple GPS locator for Xiaomi Wear Android  Amazfit Stratos 2.
-With this simple app , you can store your current location (for now or for later), and see the direction and distance to your point.
-This could be useful if don't want to forget your car on a parking ! or if you want quickly store an interesting position for fututre uses...
+Hello guys, after a long work ( ͠° ͟ʖ ͡°) on Android Studio, here is my second version of simple GPS locator for Xiaomi Wear Android  Amazfit Stratos 2 (and others?).
+This app was designed with the idea of doing like a Golf Gps wear.
+This second version allows you to :
+- select a GPX file from your gpsdata directory,
+- select a Waypoint and track the distance/direction/altitude (the compass follow the North or not)
+- store your local position on a GPX file
+- just to track a return direction to your start point (without GPX)...
+- automatic suggestion of the next nearest GPX waypoint (the next Golf hole ?).
 
-Here's the first gps startup screen. A small info about satellites in view must appear on the top of the screen.
-You can wait sometimes 10-30 seconds for this first fix.
+This could be useful if you don't want to forget your car on a parking ! or if you want quickly store an interesting position for fututre uses...
 
-<center><img src="/gpsapp_271818537.jpg" alt="gps startup fix"/></center>
+Here's the first gps startup screen. This animation just appear for 15 seconds showing the number of satellites in view.
 
-Once the gps fix is done, the main menu appear.
+<center><img src="/1-startscreen.jpg" alt="gps startup fix"/></center>
+
+The main menu appears, even the position is not ok. So it's possible to change the settings, or to find and select a waypoint to track.
 From up left to right : first button save the current position on the shared preferences of the wear.
 Second button recall a previous position and go to the gps radar.
 Third (bottom) is to exit, and the arrow is immediate radar return on the current position without save.
 
 (** a small green button is hidden on the right - this launches a test of magnetic sensors).
 
-<center><img src="/gpsapp_31818537.jpg" alt="gps main menu amazfit"/></center>
+<center><img src="/2-main-screen.jpg" alt="gps main menu amazfit"/></center>
 
 
 In radar operation - the distance displayed on the center - the compass and direction rotates when you move.
