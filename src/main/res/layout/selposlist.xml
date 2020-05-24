@@ -26,10 +26,9 @@
         android:clickable="true"
         android:divider="@android:color/holo_green_light"
         android:dividerHeight="2sp"
+        android:focusable="true"
+        android:keepScreenOn="true"
         android:longClickable="true"
-        android:outlineProvider="bounds"
-        android:requiresFadingEdge="horizontal|vertical"
-        android:scrollbarAlwaysDrawVerticalTrack="true"
         android:scrollbarSize="8dp"
         android:scrollbarStyle="outsideInset"
         android:textAlignment="center" />

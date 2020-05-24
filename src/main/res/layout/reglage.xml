@@ -8,18 +8,18 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginTop="10sp"
+        android:layout_marginTop="4sp"
         android:text="Settings"
         android:textAlignment="center"
-        android:textSize="22sp" />
+        android:textSize="19sp" />
 
     <Spinner
         android:id="@+id/gpxlist"
         android:layout_width="wrap_content"
-        android:layout_height="38dp"
+        android:layout_height="30dp"
         android:layout_gravity="center"
-        android:layout_margin="5dp"
-        android:backgroundTintMode="src_over"
+        android:layout_margin="2dp"
+        android:background="@drawable/button_bg"
         android:clickable="true"
         android:divider="@android:color/holo_green_light"
         android:dividerHeight="2sp"
@@ -36,25 +36,39 @@
         android:layout_marginTop="0dp"
         android:checked="false"
         android:gravity="center"
-        android:padding="4dp"
+        android:padding="2dp"
         android:text="@string/compass"
         android:textAlignment="gravity"
         android:textSize="18sp"
         android:textStyle="italic" />
 
     <CheckBox
-        android:id="@+id/autonextchk"
+        android:id="@+id/sortwptdistchk"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginTop="5dp"
+        android:layout_marginTop="2dp"
         android:checked="false"
         android:gravity="center"
-        android:padding="4dp"
-        android:text="@string/autonexttxt"
+        android:padding="2dp"
+        android:text="@string/sortwpttxt"
         android:textAlignment="gravity"
         android:textSize="18sp"
         android:textStyle="italic" />
+
+    <CheckBox
+    android:id="@+id/autonextchk"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:layout_marginTop="2dp"
+    android:checked="false"
+    android:gravity="center"
+    android:padding="2dp"
+    android:text="@string/autonexttxt"
+    android:textAlignment="gravity"
+    android:textSize="18sp"
+    android:textStyle="italic" />
 
     <ImageButton
         android:id="@+id/closesetting"

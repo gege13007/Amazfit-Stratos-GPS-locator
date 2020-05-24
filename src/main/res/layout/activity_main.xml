@@ -31,10 +31,11 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:text="@string/main_activity_content" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
+            android:layout_marginTop="12dp"
             android:gravity="center_horizontal"
             android:orientation="horizontal">
 
@@ -50,10 +51,11 @@
                 android:background="@drawable/readout32"
                 android:onClick="gotosavedpos" />
         </LinearLayout>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
+            android:layout_marginTop="12dp"
             android:gravity="center_horizontal"
             android:orientation="horizontal">
 

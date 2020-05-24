@@ -5,6 +5,7 @@
     <string name="savwpt_name">Save to</string>
     <string name="compass">Active compass</string>
     <string name="autonexttxt">Auto next wpt</string>
+    <string name="sortwpttxt">Sort by distance</string>
     <string name="nosave">Just GO</string>
     <string name="oksave">Save</string>
 </resources>
