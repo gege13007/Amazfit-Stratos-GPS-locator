@@ -45,6 +45,7 @@ public class Selectpos extends AppCompatActivity  {
     SharedPreferences sharedPref;
     public static String gpxini;
     String wptname;
+    int tri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,29 +58,36 @@ public class Selectpos extends AppCompatActivity  {
         //Reprend le Gpx de base
         sharedPref = getBaseContext().getSharedPreferences("POSPREFS", MODE_PRIVATE);
         gpxini = sharedPref.getString("gpxini","gpxlocator.gpx");
+        tri = sharedPref.getInt("sortbydist", 1);
 
         //Retrouve last Position courante pour tri / distances
         mylat0 = sharedPref.getFloat("dlat", (float) mylat);
         mylng0 = sharedPref.getFloat("dlng", (float) mylng);
 
-  //      mylat0=43.20; mylng0=5.30;     // TEST ONLY !!!
-   //     LireGpx();
+        //Test si gpxdata existe
+        File dir0 = new File(Environment.getExternalStorageDirectory().toString()+"/gpxdata");
+        String path0 = dir0.toString();
+        if ( !dir0.exists() ) {
+            Toast.makeText(mContext, "No 'gpxdata' directory !", Toast.LENGTH_LONG).show();
+            return;
+        }
+        String path = path0 +"/" + gpxini;
+      //  Log.d("GPXpath :", path);
 
-        String path0 = Environment.getExternalStorageDirectory().toString()+"/gpxdata";
-        String path = path0 + "/" + gpxini;
         final File gpxFile = new File(path);
         long ll = gpxFile.length();
         if ( ll <1 ) {
             Log.d("GPX :", "Creer file : " + path);
-            CreerGpx();
+            Toast.makeText(mContext, "Empty file !", Toast.LENGTH_LONG).show();
+            CreerGpx(path);
         }
         // Extrait la liste Array des 'name'
-        final List<Location> gpxList = decodeGPX(gpxFile, mylat0, mylng0);        // liste des Pos des Wpts
+        final List<Location> gpxList = decodeGPX(gpxFile, mylat0, mylng0, tri);        // liste des Pos des Wpts
         //Si Aucun Waypoints -> efface - recree
         if (nbWpts < 1) {
             Toast.makeText(mContext, "No waypoints !", Toast.LENGTH_LONG).show();
-            DeleteGpx();
-            CreerGpx();
+         //   DeleteGpx();
+         //   CreerGpx();
         }
         ArrayList<String> namesList = new ArrayList<String>();         // liste des Noms des Wpts
         for (nn = 0; nn < gpxList.size(); nn++) {
@@ -108,12 +116,12 @@ public class Selectpos extends AppCompatActivity  {
                             // Efface le wpt du meme nom
                             DeleteWptGPX(wptname);
                             // Extrait la liste Array des 'name'
-                            final List<Location> gpxList = decodeGPX(gpxFile, mylat0, mylng0);        // liste des Pos des Wpts
+                            final List<Location> gpxList = decodeGPX(gpxFile, mylat0, mylng0, tri);        // liste des Pos des Wpts
                             //Si Aucun Waypoints -> efface - recree
                             if (nbWpts < 1) {
                                 Toast.makeText(mContext, "No waypoints !", Toast.LENGTH_LONG).show();
-                                DeleteGpx();
-                                CreerGpx();
+                  //              DeleteGpx();
+                  //              CreerGpx();
                             }
                             //Reconstruit la liste des Wpts
                             ArrayList<String> namesList = new ArrayList<String>();         // liste des Noms des Wpts
@@ -163,9 +171,7 @@ public class Selectpos extends AppCompatActivity  {
 
     }
 
-    public void CreerGpx() {
-        String path0 = Environment.getExternalStorageDirectory().toString()+"/gpxdata";
-        String path = path0 + "/" + gpxini;
+    public void CreerGpx(String path) {
         File gpx = new File(path);
         try {
             gpx.createNewFile();
@@ -318,7 +324,7 @@ public class Selectpos extends AppCompatActivity  {
 
 
     //Renvoie une Liste de nbWpts triés par distance croissante à (lat0/lng0)
-    public static List<Location> decodeGPX(File file, Double lat0, Double lng0) {
+    public static List<Location> decodeGPX(File file, Double lat0, Double lng0, int tridist) {
         //Liste des positions
         List<Location> list = new ArrayList<Location>();
         DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
@@ -332,26 +338,43 @@ public class Selectpos extends AppCompatActivity  {
             nbWpts = nodelist_trkpt.getLength();
             for(int i = 0; i < nbWpts; i++){
                 String wptname="";
+                double newAlt_double=0;
                 Node node = nodelist_trkpt.item(i);
                 NamedNodeMap attributes = node.getAttributes();
                 String newLat = attributes.getNamedItem("lat").getTextContent();
                 double newLat_double = Double.parseDouble(newLat);
                 String newLon = attributes.getNamedItem("lon").getTextContent();
                 double newLon_double = Double.parseDouble(newLon);
+            //    Log.d("dcod: ", newLat+" / "+newLon);
+
                 //Calc pseudo distance à lat0/lng0
                 Double dist1=Math.pow(Math.abs(lat0-newLat_double),2);
                 Double dist2=Math.pow(Math.abs(lng0-newLon_double),2);
                 float distance = (float) Math.sqrt(dist1 + dist2);
+
                 //strip les champs inclus au trkpt
                 NodeList nList = node.getChildNodes();
                 for(int j=0; j<nList.getLength(); j++) {
                     Node el = nList.item(j);
+                    //capte le 'name'
                     if(el.getNodeName().equals("name"))  wptname = el.getTextContent();
+                    //capte 'ele' altitude
+                    if(el.getNodeName().equals("ele")) {
+                        String newAlt = el.getTextContent();
+                        newAlt_double = Double.parseDouble(newAlt);
+                    }
                 }
-                //stoc name dans le Provider
+                //Si gps sport sans nom -> met extrait de la position
+                if (wptname=="") {
+                    if (newLat.length()>6) wptname= newLat.substring(0,7); else wptname= newLat;
+                    if (newLon.length()>6) wptname+= "/"+newLon.substring(0,7); else wptname+= "/"+ newLon;
+                }
+
+                //stoc la Location dans la 'list'
                 Location newLocation = new Location(wptname);
                 newLocation.setLatitude(newLat_double);
                 newLocation.setLongitude(newLon_double);
+                newLocation.setAltitude(newAlt_double);
                 //Sauve la distance en 'Accuracy'
                 newLocation.setAccuracy(distance);
                 list.add(newLocation);
@@ -365,37 +388,38 @@ public class Selectpos extends AppCompatActivity  {
             e.printStackTrace();
         }
 
-        //Tri Croissant de la Liste des positions / distance
-        List<Location> list2 = new ArrayList<Location>();
-        //a chaque iter de j, min0 est le nouveau minimum croissant
-        Float min0=(float)0.0;
-        int j,k,index=-1,oldindex=-1;
-        for(j=0; j<list.size(); j++) {
-            //Trouve le nouveau minimum de [accuracy] dans list
-            Float min=(float)99999999.9;
-            for(k=0; k<list.size(); k++) {
-               Float a=list.get(k).getAccuracy();
-               if ((a<min)&&(a>=min0)) {
-                   if (oldindex==-1)
-                      { min=a; index=k; }
-                   else
-                      if (oldindex!=k) { min=a; index=k; }
+        if (tridist > 0) {
+            //si Tri Croissant de la Liste des positions / distance
+            List<Location> list2 = new ArrayList<Location>();
+            //a chaque iter de j, min0 est le nouveau minimum croissant
+            Float min0 = (float) 0.0;
+            int j, k, index = -1, oldindex = -1;
+            for (j = 0; j < list.size(); j++) {
+                //Trouve le nouveau minimum de [accuracy] dans list
+                Float min = (float) 99999999.9;
+                for (k = 0; k < list.size(); k++) {
+                    Float a = list.get(k).getAccuracy();
+                    if ((a < min) && (a >= min0)) {
+                        if (oldindex == -1) {
+                            min = a;
+                            index = k;
+                        } else if (oldindex != k) {
+                            min = a;
+                            index = k;
+                        }
+                    }
                 }
+                //oldindex est l'index du dernier mini trouvé pour ne pas répéter si val=
+                oldindex = index;
+                //min0 est le dernier minimum trouvé (augmente)
+                min0 = min;
+                list2.add(list.get(index));
             }
-            //oldindex est l'index du dernier mini trouvé pour ne pas répéter si val=
-            oldindex = index;
-            //min0 est le dernier minimum trouvé (augmente)
-            min0=min;
-            list2.add(list.get(index));
+            return list2;
         }
-
-        //Debug only
-        for(j=0; j<list2.size(); j++) {
-            String tt = ((Location) list2.get(j)).getProvider();
-            Log.d("nomTrie : ", Integer.toString(j)+" "+tt);
-        }
-
-        return list2;
+        //sinon retourne sans tri
+        else
+            return list;
     }
 
 }

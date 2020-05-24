@@ -1,5 +1,6 @@
 package com.samblancat.finder;
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -16,6 +17,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -108,14 +110,12 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+
     //Store & Recherche Immédiate position en cours
     public void setposcmd(View view) {
         sharedPref = getBaseContext().getSharedPreferences("POSPREFS", MODE_PRIVATE);
-
         //Sauve la Position Départ !
         final Intent intent = new Intent(MainActivity.this, Scan.class);
-
-  //      Toast.makeText(mContext, "Gps = "+Double.toString(mylat)+"/"+Double.toString(mylng), Toast.LENGTH_LONG).show();
 
         new AlertDialog.Builder(mContext)
                 .setTitle("Create Wpt ?")
@@ -144,10 +144,12 @@ public class MainActivity extends AppCompatActivity {
                 })
                 // A null listener allows the button to dismiss the dialog and take no further action.
                 .setNegativeButton(R.string.nosave,  new DialogInterface.OnClickListener() {
+                    @SuppressLint("SimpleDateFormat")
                     public void onClick(DialogInterface dialog, int which) {
                         //Sauve la Position Voulue et Go sur SCAN !
                         Calendar c = Calendar.getInstance();
-                        SimpleDateFormat df = new SimpleDateFormat("yy-MM-dd/HH:mm:ss");
+                        SimpleDateFormat df;
+                        df = new SimpleDateFormat("yy-MM-dd/HH:mm:ss");
                         String formatdate = df.format(c.getTime());
                         SharedPreferences.Editor editor = sharedPref.edit();
                         editor.putFloat("lat0", (float) mylat0);
@@ -172,8 +174,14 @@ public class MainActivity extends AppCompatActivity {
 
 
     public void appendGPX(Double la, Double lo, Double ele, String nom){
-        String path0 = Environment.getExternalStorageDirectory().toString()+"/gpxdata";
-        String path = path0 + "/gpslocator.gpx";
+        File dir0 = new File(Environment.getExternalStorageDirectory().toString()+"/gpxdata");
+        String path0 = dir0.toString();
+        if ( !dir0.exists() ) {
+            Toast.makeText(mContext, "No 'gpxdata' directory !", Toast.LENGTH_LONG).show();
+            return;
+        }
+        String path = path0 + "/" + sharedPref.getString("gpxini","gpxlocator.gpx");
+
         File gpx = new File(path);
         String path2 = path0 + "/gpslocator.tmp";
         File gpx2 = new File(path2);
@@ -233,7 +241,7 @@ public class MainActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             String la, lo, dop, fix;
             int satok = 0;
-            Double precis;
+            double precis;
 
             //Capte Qualité
             fix = intent.getStringExtra("Fix");
@@ -243,13 +251,13 @@ public class MainActivity extends AppCompatActivity {
 
             if (fix!=null) {
                 try {
-                    satok = Integer.valueOf(fix);
+                    satok = Integer.parseInt(fix);
                 } catch (Exception e) {
                     satok = 0;
                 }
                 if (satok > 0) {
                     //ici ne pas faire la.isempty() ou la.length>0 !!!
-                    try { precis = 7*Double.parseDouble(dop); } catch (Exception e) { precis = Double.valueOf(99.0); }
+                    try { precis = 7*Double.parseDouble(dop); } catch (Exception e) { precis = 99.0; }
                     String t = new DecimalFormat("##0.0").format(precis);
                     ptxt.setText("Precision " + t + "m");
                 } else
@@ -258,6 +266,9 @@ public class MainActivity extends AppCompatActivity {
                 if ((satok > 0) && (blinking > 0)) {
                     ptxt.clearAnimation();
                     blinking = 0;
+                    Animation aniRotateClk = AnimationUtils.loadAnimation(getApplicationContext(),R.anim.rotate);
+                    ImageButton img = findViewById(R.id.gotocmd);
+                    img.startAnimation(aniRotateClk);
                 }
                 if ((satok < 1) && (blinking < 1)) {
                     //Fait clignoter "Waiting pos" tant que pas de fix
@@ -268,6 +279,9 @@ public class MainActivity extends AppCompatActivity {
                     anim.setRepeatCount(Animation.INFINITE);
                     ptxt.startAnimation(anim);
                     blinking = 1;
+
+                    ImageButton img = findViewById(R.id.gotocmd);
+                    img.clearAnimation();
                 }
             }
 

@@ -10,6 +10,8 @@ import android.widget.TextView;
 import android.content.Context;
 import android.os.Bundle;
 
+import java.util.Random;
+
 public class GpsSetup extends AppCompatActivity {
     private BroadcastReceiver receiver;
     public static final String BROADCAST_ACTION = "com.samblancat";
@@ -17,7 +19,7 @@ public class GpsSetup extends AppCompatActivity {
     public static int main_started = 0;
     public String gsv;
     public Intent I;
-    public int cap=0;
+    public int cap=0, ab=0, dcap;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,22 +37,29 @@ public class GpsSetup extends AppCompatActivity {
         Intent I = new Intent(mContext, com.samblancat.finder.LocService.class);
         mContext.startService(I);
 
+        Random r = new Random();
+        ab = r.nextInt((190-90)+1)+90;
+        dcap=6;
+
         //Lance le Countdown de 10sec minimum avant lancement main...
-        new CountDownTimer(18000, 50) {
+        new CountDownTimer(10000, 50) {
             public void onTick(long millisUntilFinished) {
                 TextView t=findViewById(R.id.progBarText);
                 int sec=Math.round(millisUntilFinished / 1000);
-       /*         if ((sec % 3)==0)
-                    t.setText("        ");
-                else
-                    t.setText("Waiting GPS fix"); */
 
                 //Tourne la flèche
                 ImageView imgview;
                 imgview = (ImageView) findViewById(R.id.faisceau);
                 imgview.setRotation((float) cap);
-                cap+=8;
+
+                cap += dcap;
+                if (Math.abs(cap - ab)<7) {
+                    Random r = new Random();
+                    ab = ab - dcap*(r.nextInt((28 - 12) + 1) + 12);
+                    dcap=-dcap;
+                }
             }
+
             public void onFinish() {
                 //Lance le MainActivity
                 main_started = 1;
@@ -93,6 +102,7 @@ public class GpsSetup extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             gsv = intent.getStringExtra("Sat");
+            if (gsv==null) gsv="00";
             TextView txt = findViewById(R.id.gsvtxt);
             txt.setText(gsv+" sats");
 

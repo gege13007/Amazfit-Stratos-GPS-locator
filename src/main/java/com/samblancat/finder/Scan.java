@@ -41,11 +41,11 @@ public class Scan extends AppCompatActivity implements SensorEventListener {
     String wptname;
     double cap, cap0, compas=0;
     //Flag si compas bouge
-    Integer compasok=1;
+    int compasok=0;
     //Flag si next wpt auto
-    Integer autonext=0, counter=0;
+    int autonext=0, counter=0;
     //Flag état de la recherche 0:rien,  1:scan rapprochement, 2:proche arrivé, 3:s'éloigne
-    Integer arrived=0;
+    int arrived=0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +57,7 @@ public class Scan extends AppCompatActivity implements SensorEventListener {
 
         //Récup la config.
         sharedPref = getBaseContext().getSharedPreferences("POSPREFS", MODE_PRIVATE);
-        compasok = sharedPref.getInt("compas", 1);
+        compasok = sharedPref.getInt("compas", 0);
         autonext = sharedPref.getInt("autonext", 0);
 
         //Retrouve Position de Destination
@@ -88,6 +88,23 @@ public class Scan extends AppCompatActivity implements SensorEventListener {
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(BROADCAST_ACTION);
         registerReceiver(receiver, intentFilter);
+
+        ImageView imgView=(ImageView) findViewById(R.id.boussole);
+        imgView.setOnClickListener(new View.OnClickListener() {
+            //@Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Scan.this, Carto.class);
+                startActivity(intent);
+            }
+        });
+        imgView=(ImageView) findViewById(R.id.gradcompas);
+        imgView.setOnClickListener(new View.OnClickListener() {
+            //@Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Scan.this, Carto.class);
+                startActivity(intent);
+            }
+        });
     }
 
     @Override
@@ -105,7 +122,7 @@ public class Scan extends AppCompatActivity implements SensorEventListener {
         super.onPause();
         //Arrete le Sensor listener
         if (compasok>0) mSensorManager.unregisterListener(this);
-        Log.d("TAG : ", "onPause: ");
+        //Log.d("TAG : ", "onPause: ");
     }
 
     @Override
@@ -119,7 +136,7 @@ public class Scan extends AppCompatActivity implements SensorEventListener {
             Sensor magnetSensor = mSensorManager.getDefaultSensor(3);
             mSensorManager.registerListener(this, magnetSensor, SensorManager.SENSOR_DELAY_NORMAL);
         }
-        Log.d("TAG : ", "onResume");
+       // Log.d("TAG : ", "onResume");
     }
 
     //POUR GESTION MAGNETIC SENSOR
@@ -140,13 +157,16 @@ public class Scan extends AppCompatActivity implements SensorEventListener {
     }
 
     public Location getNextWpt(Double lat, Double lng) {
+        int tri;
         // Extrait la liste Array des 'name'
         //Reprend le Gpx de base
         sharedPref = getBaseContext().getSharedPreferences("POSPREFS", MODE_PRIVATE);
+        tri = sharedPref.getInt("sortbydist", 1);
         String path0 = Environment.getExternalStorageDirectory().toString()+"/gpxdata";
         String path = path0 + "/" + sharedPref.getString("gpxini","gpxlocator.gpx");
+
         File gpx = new File(path);
-        final List<Location> gpxList = decodeGPX(gpx, lat, lng);        // liste des Pos des Wpts
+        final List<Location> gpxList = decodeGPX(gpx, lat, lng, tri);        // liste des Pos des Wpts
         //Si Aucun Waypoints -> efface - recree
         if (gpxList.size() > 1) {
             //Va chercher le wptname qui suit l'actuel
@@ -159,6 +179,7 @@ public class Scan extends AppCompatActivity implements SensorEventListener {
         return(null);
     }
 
+
     //Attention ! Les données arrive ici par paquets : un coup du gsv,
     //un coup du Lat/lon... il peut donc y avoir du null...
     public class MyReceiver extends BroadcastReceiver {
@@ -166,7 +187,8 @@ public class Scan extends AppCompatActivity implements SensorEventListener {
         @Override
         public void onReceive(Context context, Intent intent) {
             String tp, la, lo, alt, fix;
-            Integer satok;
+            int satok;
+            double al;
 
             TextView  dtxt = (TextView) findViewById(R.id.todisttxt);
             TextView atxt = (TextView) findViewById(R.id.speedtxt);
@@ -175,18 +197,18 @@ public class Scan extends AppCompatActivity implements SensorEventListener {
             //write your code here to be executed after 1 second
             TextView timtxt = (TextView) findViewById(R.id.timetxt);
             Calendar c = Calendar.getInstance();
-            SimpleDateFormat df = new SimpleDateFormat("HH:mm");
+            SimpleDateFormat df = new SimpleDateFormat("HH:mm:ss");
             String formattime = df.format(c.getTime());
             timtxt.setText(formattime);
 
             //Capte Qualité
             fix = intent.getStringExtra("Fix");
             if (fix!=null) {
-                try { satok = Integer.valueOf(fix);
+                try { satok = Integer.parseInt(fix);
                 } catch (Exception e) { satok = 0; }
                 if (satok == 0) {
                     dtxt.setText("-.-");
-                    atxt.setText("Alt-");
+                    atxt.setText("alt-");
                     imb.setVisibility(View.INVISIBLE);
                     return;
                 }
@@ -194,7 +216,12 @@ public class Scan extends AppCompatActivity implements SensorEventListener {
 
             //essaie de capter Altitude
             alt = intent.getStringExtra("Alt");
-            if (alt!=null) atxt.setText(alt+" m");
+            if (alt!=null) {
+                try { al = Double.parseDouble(alt); }
+                catch (Exception e) { al=0; }
+                DecimalFormat altprec = new DecimalFormat("###0");
+                atxt.setText("alt "+altprec.format(al)+"m");
+            }
 
             la =  intent.getStringExtra("Lat");
             lo = intent.getStringExtra("Lon");
@@ -221,6 +248,7 @@ public class Scan extends AppCompatActivity implements SensorEventListener {
                         //on est arrivé et on s'éloigne
                         arrived = 3;
                         dtxt.setTextColor(Color.GREEN);
+                        //Si Changement Auto de next Wpt
                         if (autonext > 0) {
                             //Va deja chercher le next wpt !
                             final Location nloc = getNextWpt(mylat, mylng);
