@@ -35,8 +35,16 @@ In radar operation - the time & distance & altitude are displayed on the center 
 The settings view, allows to change the gpx file.
 To enable or not, the magnetic sensor and compass mooving (not good for the battery!).
 To enable or not the automatic waypoint suggestion.
+To sort the waypoints with the distance to actual position or not.
 
 <center><img src="/4-settings.jpg" alt="gps radar stratos 2"/></center>
+
+The settings view, allows to change the gpx file.
+To enable or not, the magnetic sensor and compass mooving (not good for the battery!).
+To enable or not the automatic waypoint suggestion.
+To sort the waypoints with the distance to actual position or not.
+
+<center><img src="/5-carto2.jpg" alt="gps carto stratos"/></center>
 
 How this works
 --------------
