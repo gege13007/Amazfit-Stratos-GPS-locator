@@ -53,7 +53,7 @@ To enable or not, the magnetic sensor and compass mooving (not good for the batt
 To enable or not the automatic waypoint suggestion.
 To sort the waypoints with the distance to actual position or not.
 
-And two examples of the map display. On left a sport run track with many waypoints recorder by the Wear. On right a simple gpx file with some golf holes.
+And two examples of the map display. On left a sport run track with many waypoints recorded by the Wear. It is still possible to zoom in untill you see each points. On the right a simple gpx file with some golf holes. The zoom map scale is displayed on the + / - zoom buttons.
 
 <center><img src="/6-carto2.jpg" alt="gps carto stratos"/></center>
 
