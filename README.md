@@ -1,9 +1,10 @@
 # Android Wear Amazfit GPS Direction Finder & GPX reader
 Simple &amp; effective GPS locator app for Amazfit Xiaomi android wear
 ------------------------------------------------------------------------------
-Hello guys, after a long work and first experience with Android Studio, here is my second version of simple GPS locator for Wear Android  . The app was tested on my Xiaomi Amazfit Stratos 2 (but must be fine on many others !).
+Hello guys, after a long work and first experience with Android Studio, here is my third version of my simple GPS locator for Wear Android.
+This app was tested on my Xiaomi Amazfit Stratos 2, on PACE... (but must be fine on many others !).
 This app was designed with the idea of doing like a Golf Gps wear.
-This second version allows you to :
+The second version allows you to :
 - select a GPX file from your gpsdata directory,
 - select a Waypoint and track the distance/direction/altitude (the compass follow the North or not)
 - store your local position on a GPX file
@@ -11,7 +12,15 @@ This second version allows you to :
 - just to track a return direction to your start point (without GPX)...
 - automatic suggestion of the next nearest GPX waypoint (the next Golf hole ?).
 
-This could be useful if you don't want to forget your car on a parking ! or if you want quickly store an interesting position for fututre uses...
+The last third version includes :
+- many fix and checks in gpx files handling,
+- little graphics animations, hour added in the radar screen.
+- checkbox to enable or not to list the (gpx) waypoints by the distance (nearest point first) or not (in initial gpx order).
+
+- a new CARTO screen displaying the waypoints and the actual position (white circle).
+The altitude is also displayed with colors. Blue is for the deepest points, and red for the hightest points of the track.
+Just tap on the screen, to switch beetween Radar & Carto. It ' s also possible to zoom in & out and to swipe the map.
+When in magnetic compass mode, the map is turning !
 
 Here's the first gps startup screen. This animation just appear for 15 seconds showing the number of satellites in view.
 
@@ -44,15 +53,17 @@ To enable or not, the magnetic sensor and compass mooving (not good for the batt
 To enable or not the automatic waypoint suggestion.
 To sort the waypoints with the distance to actual position or not.
 
-<center><img src="/5-carto2.jpg" alt="gps carto stratos"/></center>
+And two examples of the map display. On left a sport run track with many waypoints recorder by the Wear. On right a simple gpx file with some golf holes.
 
-How this works
+<center><img src="/6-carto2.jpg" alt="gps carto stratos"/></center>
+
+How this workss
 --------------
 The first activity launches a service who assumes the background task of getting GPS location (with a locationManager and locationListener). This avoid to stop and re-run the gps updates between each activities, and assures that just ONE first fix delay is necessary when you start the app.
 The lat & long are broadcasted to the other activities with 'sendBroadcast & broadcastReceiver'.
 The first screen uses a 'nmealistener' to get & display a snapshot of the $GPGSV & GPGGA frames.
 The location service and its broadcats is only stopped, when the app is destroyed (if not - your battery don't last so long)...
-We use the 'magnetic orientation sensor type3' to rotate the compass graduations, with a sensorManager.registerListener.
+We use the 'magnetic orientation sensor type3' to rotate the compass graduations and map, with a sensorManager.registerListener.
 
 Change log
 ----------
@@ -64,7 +75,4 @@ Change log
          
 14/5/2020  Version 2 , with GPX file compatibility, and 'autonext' waypoint detection.
 
-
-What's left to do ?
-------------------
-==> Implement a simple cartography display of the tracks.
+24/05/2020 Version 3 - many fix & Map
