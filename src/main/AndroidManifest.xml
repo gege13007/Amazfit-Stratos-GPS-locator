@@ -6,7 +6,6 @@
     <uses-feature android:name="android.hardware.type.watch"/>
     <uses-sdk tools:overrideLibrary="android.support.wear" />
     <uses-feature android:name="android.location" />
-    <uses-feature android:name="android.hardware.location.gps" />
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -33,12 +32,16 @@
             </intent-filter>
         </activity>
         <activity android:name=".MainActivity">
-     </activity>
+        </activity>
         <activity android:name=".Scan">
         </activity>
         <activity android:name=".Selectpos">
         </activity>
         <activity android:name=".reglages">
+        </activity>
+        <activity android:name=".Carto">
+        </activity>
+        <activity android:name=".cartodraw">
         </activity>
     </application>
 
