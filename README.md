@@ -13,7 +13,7 @@ It's possible to move the maps by simply swiping the screen.
 A Long Click on the map, let you select your new Destination point (or to save a new waypoint).
 A simple click close the map.
 
-<center><img src="/2-main-screen.jpg" alt="gps main menu"/></center>
+<center><img src="/cartos-2020-06-01.jpg" alt="gps carto osmaps"/></center>
 
 2/ The compass radar display shows : time, distance & altitude to your nav destination.
 If you activate the magnetic compass of the wear, the cursor indicates the real direction.
