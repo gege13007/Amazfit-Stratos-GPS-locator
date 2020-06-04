@@ -1,10 +1,27 @@
 # Android Wear GPS OpenStreet Maps & GPX reader
 Simple &amp; effective GPS locator app for Amazfit Xiaomi android wear
 ------------------------------------------------------------------------------
-Here is my last version of GPS locator for Wear Android.
-This app was tested on my Xiaomi Amazfit Stratos 2, PACE... (but must be fine on many others !).
-This app was designed with the idea of doing like a Golf Gps wear.
-The second version allows you to :
+Here is my last version of GPS Maps & compass locator for Wear Android (tested on Xiaomi Amazfit Stratos 2, PACE... but must be fine on many others). My frist idea was to make a simple position reminder with a compass display or may be a Golf Gps watch ?
+
+This app includes 4 main windows :
+
+1/ The Map viewer can display 'Open Street Maps' from zoom level 3 to 16. You can change the zoom level, and center the map on actual position with a simple click on the 3 buttons on the bottom of the screen.
+The selected GPX points are plotted on the map, with different colors depending on the altitude.
+A line is plotted to the destination point.
+A blue marker indicates your actual position.
+It's possible to move the maps by simply swiping the screen.
+A Long Click on the map, let you select your new Destination point (or to save a new waypoint).
+A simple click close the map.
+
+2/ The compass radar display shows : time, distance & altitude to your nav destination.
+If you activate the magnetic compass of the wear, the cursor indicates the real direction.
+Without magnetic sensor, the north is on the top of screen.
+A Long Click on the compass, let you mark the actual position for ar new Destination (or to save a new waypoint).
+Swipe to close the map.
+
+<center><img src="/5-scann.jpg" alt="gps radar stratos 2"/></center>
+
+second version allows you to :
 - select a GPX file from your gpsdata directory,
 - select a Waypoint and track the distance/direction/altitude (the compass follow the North or not)
 - store your local position on a GPX file
