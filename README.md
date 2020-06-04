@@ -1,8 +1,8 @@
-# Android Wear Amazfit GPS Direction Finder & GPX reader
+# Android Wear GPS OpenStreet Maps & GPX reader
 Simple &amp; effective GPS locator app for Amazfit Xiaomi android wear
 ------------------------------------------------------------------------------
-Hello guys, after a long work and first experience with Android Studio, here is my third version of my simple GPS locator for Wear Android.
-This app was tested on my Xiaomi Amazfit Stratos 2, on PACE... (but must be fine on many others !).
+Here is my last version of GPS locator for Wear Android.
+This app was tested on my Xiaomi Amazfit Stratos 2, PACE... (but must be fine on many others !).
 This app was designed with the idea of doing like a Golf Gps wear.
 The second version allows you to :
 - select a GPX file from your gpsdata directory,
@@ -12,7 +12,7 @@ The second version allows you to :
 - just to track a return direction to your start point (without GPX)...
 - automatic suggestion of the next nearest GPX waypoint (the next Golf hole ?).
 
-The last third version includes :
+The third version includes :
 - many fix and checks in gpx files handling,
 - little graphics animations, hour added in the radar screen.
 - checkbox to enable or not to list the (gpx) waypoints by the distance (nearest point first) or not (in initial gpx order).
@@ -20,7 +20,6 @@ The last third version includes :
 - a new CARTO screen displaying the waypoints and the actual position (white circle).
 The altitude is also displayed with colors. Blue is for the deepest points, and red for the hightest points of the track.
 Just tap on the screen, to switch beetween Radar & Carto. It ' s also possible to zoom in & out and to swipe the map.
-When in magnetic compass mode, the map is turning !
 
 Here's the first gps startup screen. This animation just appear for 15 seconds showing the number of satellites in view.
 
