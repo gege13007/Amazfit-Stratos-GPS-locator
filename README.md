@@ -18,25 +18,21 @@ Here is an example of 4 levels of zoom from 4 to 15 (maximum details).
 <center><img src="/cartos-2020-06-01.jpg" alt="gps carto osmaps"/></center>
 
 
-2/ The compass radar display shows : time, distance & altitude to your nav destination.
-If you activate the magnetic compass of the wear, the cursor indicates the real direction.
-Without magnetic sensor, the north is on the top of screen.
-A Long Click on the compass, let you mark the actual position for ar new Destination (or to save a new waypoint).
+2/ The compass is active when you firstly have selected a nav destination (long click on map or compas), or a waypoint in your Gpx file list.
+The compass radar will display : the time, distance & altitude to your nav destination.
+If you activate the magnetic sensor (with compatible wear) on the config window, the compass will turn to indicate the real direction.
+Without magnetic sensor, the north is on the top of screen (at 12 hours).
+A Long Click on the compass, let you mark the actual position as new Destination (or to save a new waypoint).
 Swipe to close the map.
 
 <center><img src="/5-scann.jpg" alt="gps radar stratos 2"/></center>
 
-second version allows you to :
-- select a GPX file from your gpsdata directory,
-- select a Waypoint and track the distance/direction/altitude (the compass follow the North or not)
-- store your local position on a GPX file
-- remove a waypoint from your GPX file.
-- just to track a return direction to your start point (without GPX)...
-- automatic suggestion of the next nearest GPX waypoint (the next Golf hole ?).
+3/ The Gpx list view, allows you select a destination by simple click on list.
+A 'LONG CLICK' remove the point. A 'simple click' select your destination.
+You must have a 'gpx' directory on the root of the wear (external storage memory).
 
-The third version includes :
-- many fix and checks in gpx files handling,
-- little graphics animations, hour added in the radar screen.
+<center><img src="/3-wpt-liste.jpg" alt="liste waypoint gps menu"/></center>
+
 - checkbox to enable or not to list the (gpx) waypoints by the distance (nearest point first) or not (in initial gpx order).
 
 - a new CARTO screen displaying the waypoints and the actual position (white circle).
