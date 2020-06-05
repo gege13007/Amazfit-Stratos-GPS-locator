@@ -76,8 +76,8 @@ The location service and its broadcats is only stopped, when the app is destroye
 We use the 'magnetic orientation sensor type3' to rotate the compass graduations and map, with a sensorManager.registerListener.
 
 For the Maps, I NEVER get to make it work the OSMdroid library ! NEVER ! So I made my own implementation of the tiles selection formula.
-Each OSM tile is a 256*256 png bitmap displayed with usual canvas drawing functions.
-Each tile is resized on a 512*512 pixels bitmap, to get more visibility on small screens.
+Each OSM tile is a 256x256 png bitmap displayed with usual canvas drawing functions.
+Each tile is resized on a 512x512 pixels bitmap, to get more visibility on small screens.
 
 IMPORTANT NOTE !
 ---------------
@@ -95,6 +95,6 @@ Change log
 
 24/05/2020 Version 3 - many fix & Map
 2/06/2020  Version 4 - Long click on Maps and many fixs
-05/06/2020 Version 4.2 - modif on stop app !!!
+05/06/2020 Version 4.2 - modif on stop app !
 
-./06/2020 What's left to do - make Beautiful styled Alert Dialog box - Display Speed ? - Mode Golf ? 
+./2020 What's left to do - make Beautiful styled Alert Dialog box - Display Speed ? - Mode Golf ? 
