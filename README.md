@@ -1,16 +1,16 @@
 # Android Wear GPS OpenStreet Maps & GPX reader
 Simple &amp; effective GPS locator app for Amazfit Xiaomi android wear
 ------------------------------------------------------------------------------
-Here is the last version of GPS Maps & compass Locator for Wear Android (tested on Xiaomi Amazfit Stratos 2, PACE... but must be fine on many others). My first idea was to make a simple position reminder with a compass display or may be a Golf Gps watch ?
+Here is the last version of GPS Maps & compass Locator for Wear Android (tested on Xiaomi Amazfit Stratos 2, PACE... but must be fine on many others). My first idea was to make a simple position reminder with a compass display, or may be a Golf Gps watch. We have now a Gpx file and Open Street Map viewer.
 
 This app includes 4 main windows :
 
-1/ The Map viewer can display 'Open Street Maps' from zoom level 3 to 16. You can change the zoom level, and center the map on actual position with a simple click on the 3 buttons on the bottom of the screen.
-The selected GPX points are plotted on the map, with different colors depending on the altitude.
-A line is plotted to the destination point.
+1/ The Map viewer can display 'Open Street Maps' from zoom level 3 to 16. You can change the zoom level, and center the map on actual position with a simple click on the 3 buttons on the bottom of the screen. A distance scale and the osmap zoom level are displayed on the bottom of the screen. The scale (in km) is equal to the distance represented by the horizontal line. 
+The selected GPX points are plotted on the map, with different colors depending on the altitude (blue is deep, and red is hight).
+On nav mode, a line is plotted to the destination point.
 A blue marker indicates your actual position.
 It's possible to move the maps by simply swiping the screen.
-A Long Click on the map, let you select your new Destination point (or to save a new waypoint).
+A LONG ClICK on the map, let you select your new Destination point (or to save a new waypoint).
 A simple click close the map.
 
 Here is an example of 2 levels of zoom from 4 to 15 (maximum details).
@@ -38,8 +38,7 @@ Third (bottom) is to exit, and the arrow is to start the tracking radar. Storing
 
 <center><img src="/2-main-screen.jpg" alt="gps main menu"/></center>
 
-
-The settings view, allows to select a gpx file (it can be an export of your sports activities).
+5/ The settings view, allows to select a gpx file (it can be an export of your sports activities).
 To enable or not, the magnetic sensor and compass mooving (not good for your battery!).
 To enable or not the automatic waypoint suggestion.
 To sort the waypoints with the distance to actual position (next wpt is the closest), or not (leave in the list order).
@@ -78,6 +77,7 @@ We use the 'magnetic orientation sensor type3' to rotate the compass graduations
 
 For the Maps, I NEVER get to make it work the OSMdroid library ! NEVER ! So I made my own implementation of the tiles selection formula.
 Each OSM tile is a 256*256 png bitmap displayed with usual canvas drawing functions.
+Each tile is resized on a 512*512 pixels bitmap, to get more visibility on small screens.
 
 IMPORTANT NOTE !
 ---------------
