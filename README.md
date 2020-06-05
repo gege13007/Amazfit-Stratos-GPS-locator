@@ -15,7 +15,7 @@ A simple click close the map.
 
 Here is an example of 2 levels of zoom from 4 to 15 (maximum details).
 
-<center><img src="/6-carto2.jpg" alt="gps carto osmaps"/></center>
+<center><img src="/6-carto3.jpg" alt="gps carto osmaps"/></center>
 
 2/ The compass is active when you firstly have selected a nav destination (long click on map or compas), or a waypoint in your Gpx file list.
 The compass radar will display : the time, distance & altitude to your nav destination.
@@ -39,18 +39,12 @@ Third (bottom) is to exit, and the arrow is to start the tracking radar. Storing
 <center><img src="/2-main-screen.jpg" alt="gps main menu"/></center>
 
 
-The settings view, allows to change the gpx file.
-To enable or not, the magnetic sensor and compass mooving (not good for the battery!).
+The settings view, allows to select a gpx file (it can be an export of your sports activities).
+To enable or not, the magnetic sensor and compass mooving (not good for your battery!).
 To enable or not the automatic waypoint suggestion.
-To sort the waypoints with the distance to actual position or not.
+To sort the waypoints with the distance to actual position (next wpt is the closest), or not (leave in the list order).
 
 <center><img src="/4-settings.jpg" alt="gps radar stratos 2"/></center>
-
-The settings view, allows to change the gpx file.
-To enable or not, the magnetic sensor and compass mooving (not good for the battery!).
-To enable or not the automatic waypoint suggestion.
-To sort the waypoints with the distance to actual position or not.
-
 
 Here's the first gps startup screen. This animation just appear for 10 seconds showing the number of satellites in view.
 The first gps fixing time depends of your situation, the meteo... From 2 to 30 seconds, it's faster if you don't move...
@@ -64,6 +58,15 @@ Then in OSMaps, you will have a subdirectory for each zoom level - from '2' (cou
 In each subdirectory the tiles are stored with their X/Y coordinatess numbers.
 Don't worry about that, just download and run 'MOBILE ATLAS CREATOR' ( https://mobac.sourceforge.io/ ).
 
+<center><img src="/mobac1.jpg" alt="mobac osm maps"/></center>
+
+Click on 'Nouvel Atlas' (OSMdroid ZIP). With the checkboxes on the left you must select the zoom level to include in your atlas.
+The level 15 includes small details and is not available for every country or cities. The level 15 represent a 2X size of datas than zoom 14, and 4X than zoom 13. So don't try to select the entire world on zoom level 14 !
+Click 'Ajouter a la selection', and 'Creer Atlas'.
+Unzip the file, and copy all repertories to your wear ("/OSMaps").
+You must have something like this.
+
+<center><img src="/osmaps-wear1.jpg" alt="wear osm maps"/></center>
 
 How this works
 --------------
