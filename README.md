@@ -52,11 +52,6 @@ Third (bottom) is to exit, and the arrow is to start the tracking radar. Storing
 When you click on select waypoint, the listview shows all gpx points sorted by the distance to your position.
 A 'Long Click' on a point allows you to remove the point. A 'simple click' select your destination.
 
-<center><img src="/3-wpt-liste.jpg" alt="liste waypoint gps menu"/></center>
-
-In radar operation - the time & distance & altitude are displayed on the center - the compass and direction rotates when you move.
-
-<center><img src="/5-scann.jpg" alt="gps radar stratos 2"/></center>
 
 The settings view, allows to change the gpx file.
 To enable or not, the magnetic sensor and compass mooving (not good for the battery!).
@@ -72,15 +67,33 @@ To sort the waypoints with the distance to actual position or not.
 
 And two examples of the map display. On left a sport run track with many waypoints recorded by the Wear. It is still possible to zoom in untill you see each points. On the right a simple gpx file with some golf holes. The zoom map scale is displayed on the + / - zoom buttons.
 
-<center><img src="/6-carto2.jpg" alt="gps carto stratos"/></center>
+Here's the first gps startup screen. This animation just appear for 10 seconds showing the number of satellites in view.
+The first gps fixing time depends of your situation, the meteo... From 2 to 30 seconds, it's faster if you don't move...
 
-How this workss
+<center><img src="/1-startscreen.jpg" alt="gps startup fix"/></center>
+
+Where are the MAPS ?
+-------------------
+You MUST create a directory 'OSMaps' directory on your wear.
+Then in OSMaps, you will have a subdirectory for each zoom level - from '2' (country level) to '16' (to see your home).
+In each subdirectory the tiles are stored with their X/Y coordinatess numbers.
+Don't worry about that, just download and run 'MOBILE ATLAS CREATOR' ( https://mobac.sourceforge.io/ ).
+
+
+How this works
 --------------
 The first activity launches a service who assumes the background task of getting GPS location (with a locationManager and locationListener). This avoid to stop and re-run the gps updates between each activities, and assures that just ONE first fix delay is necessary when you start the app.
 The lat & long are broadcasted to the other activities with 'sendBroadcast & broadcastReceiver'.
 The first screen uses a 'nmealistener' to get & display a snapshot of the $GPGSV & GPGGA frames.
 The location service and its broadcats is only stopped, when the app is destroyed (if not - your battery don't last so long)...
 We use the 'magnetic orientation sensor type3' to rotate the compass graduations and map, with a sensorManager.registerListener.
+
+For the Maps, I NEVER get to make it work the OSMdroid library ! NEVER ! So I made my own implementation of the tiles selection formula.
+Each OSM tile is a 256*256 png bitmap displayed with usual canvas drawing functions.
+
+IMPORTANT NOTE !
+---------------
+Beware of the electric power drawned by the GPS & Magnetic Sensor. There is no problem if you quitt the App by the 'MAIN MENU' - the task & gps will be off. But don't forget to really close the app, if you are in an other view, and quitt the app with a wear button... 
 
 Change log
 ----------
@@ -93,3 +106,6 @@ Change log
 14/5/2020  Version 2 , with GPX file compatibility, and 'autonext' waypoint detection.
 
 24/05/2020 Version 3 - many fix & Map
+2/06/2020  Version 4 - Long click on Maps and many fixs
+
+./06/2020 What's left to do - make Beautiful styled Alert Dialog box - Display Speed ? - Mode Golf ? 
