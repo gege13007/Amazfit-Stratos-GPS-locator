@@ -33,16 +33,6 @@ You must have a 'gpx' directory on the root of the wear (external storage memory
 
 <center><img src="/3-wpt-liste.jpg" alt="liste waypoint gps menu"/></center>
 
-- checkbox to enable or not to list the (gpx) waypoints by the distance (nearest point first) or not (in initial gpx order).
-
-- a new CARTO screen displaying the waypoints and the actual position (white circle).
-The altitude is also displayed with colors. Blue is for the deepest points, and red for the hightest points of the track.
-Just tap on the screen, to switch beetween Radar & Carto. It ' s also possible to zoom in & out and to swipe the map.
-
-Here's the first gps startup screen. This animation just appear for 15 seconds showing the number of satellites in view.
-
-<center><img src="/1-startscreen.jpg" alt="gps startup fix"/></center>
-
 The main menu appears even if the position is not ok. So it's possible to change the settings, or to find and select a waypoint to track.
 From up left to right : first button start the settings, the second is for select a Gps waypoint from a gpx file.
 Third (bottom) is to exit, and the arrow is to start the tracking radar. Storing the current position or not.
@@ -51,7 +41,6 @@ Third (bottom) is to exit, and the arrow is to start the tracking radar. Storing
 
 When you click on select waypoint, the listview shows all gpx points sorted by the distance to your position.
 A 'Long Click' on a point allows you to remove the point. A 'simple click' select your destination.
-
 
 The settings view, allows to change the gpx file.
 To enable or not, the magnetic sensor and compass mooving (not good for the battery!).
@@ -65,7 +54,6 @@ To enable or not, the magnetic sensor and compass mooving (not good for the batt
 To enable or not the automatic waypoint suggestion.
 To sort the waypoints with the distance to actual position or not.
 
-And two examples of the map display. On left a sport run track with many waypoints recorded by the Wear. It is still possible to zoom in untill you see each points. On the right a simple gpx file with some golf holes. The zoom map scale is displayed on the + / - zoom buttons.
 
 Here's the first gps startup screen. This animation just appear for 10 seconds showing the number of satellites in view.
 The first gps fixing time depends of your situation, the meteo... From 2 to 30 seconds, it's faster if you don't move...
@@ -74,7 +62,7 @@ The first gps fixing time depends of your situation, the meteo... From 2 to 30 s
 
 Where are the MAPS ?
 -------------------
-You MUST create a directory 'OSMaps' directory on your wear.
+You MUST create an 'OSMaps' directory on your wear.
 Then in OSMaps, you will have a subdirectory for each zoom level - from '2' (country level) to '16' (to see your home).
 In each subdirectory the tiles are stored with their X/Y coordinatess numbers.
 Don't worry about that, just download and run 'MOBILE ATLAS CREATOR' ( https://mobac.sourceforge.io/ ).
