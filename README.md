@@ -1,7 +1,7 @@
 # Android Wear GPS OpenStreet Maps & GPX reader
 Simple &amp; effective GPS locator app for Amazfit Xiaomi android wear
 ------------------------------------------------------------------------------
-Here is my last version of GPS Maps & compass locator for Wear Android (tested on Xiaomi Amazfit Stratos 2, PACE... but must be fine on many others). My frist idea was to make a simple position reminder with a compass display or may be a Golf Gps watch ?
+Here is the last version of GPS Maps & compass Locator for Wear Android (tested on Xiaomi Amazfit Stratos 2, PACE... but must be fine on many others). My first idea was to make a simple position reminder with a compass display or may be a Golf Gps watch ?
 
 This app includes 4 main windows :
 
@@ -13,10 +13,9 @@ It's possible to move the maps by simply swiping the screen.
 A Long Click on the map, let you select your new Destination point (or to save a new waypoint).
 A simple click close the map.
 
-Here is an example of 4 levels of zoom from 4 to 15 (maximum details).
+Here is an example of 2 levels of zoom from 4 to 15 (maximum details).
 
-<center><img src="/cartos-2020-06-01.jpg" alt="gps carto osmaps"/></center>
-
+<center><img src="/6-carto2.jpg" alt="gps carto osmaps"/></center>
 
 2/ The compass is active when you firstly have selected a nav destination (long click on map or compas), or a waypoint in your Gpx file list.
 The compass radar will display : the time, distance & altitude to your nav destination.
@@ -33,14 +32,12 @@ You must have a 'gpx' directory on the root of the wear (external storage memory
 
 <center><img src="/3-wpt-liste.jpg" alt="liste waypoint gps menu"/></center>
 
-The main menu appears even if the position is not ok. So it's possible to change the settings, or to find and select a waypoint to track.
+4/ The main menu appears even if the position is not ok. So it's possible to change the settings, or to find and select a waypoint to track.
 From up left to right : first button start the settings, the second is for select a Gps waypoint from a gpx file.
 Third (bottom) is to exit, and the arrow is to start the tracking radar. Storing the current position or not.
 
 <center><img src="/2-main-screen.jpg" alt="gps main menu"/></center>
 
-When you click on select waypoint, the listview shows all gpx points sorted by the distance to your position.
-A 'Long Click' on a point allows you to remove the point. A 'simple click' select your destination.
 
 The settings view, allows to change the gpx file.
 To enable or not, the magnetic sensor and compass mooving (not good for the battery!).
@@ -95,5 +92,6 @@ Change log
 
 24/05/2020 Version 3 - many fix & Map
 2/06/2020  Version 4 - Long click on Maps and many fixs
+05/06/2020 Version 4.2 - modif on stop app !!!
 
 ./06/2020 What's left to do - make Beautiful styled Alert Dialog box - Display Speed ? - Mode Golf ? 
