@@ -91,12 +91,12 @@ public class Selectpos extends AppCompatActivity  {
         }
         ArrayList<String> namesList = new ArrayList<String>();         // liste des Noms des Wpts
         for (nn = 0; nn < gpxList.size(); nn++) {
-            String tt = ((Location) gpxList.get(nn)).getProvider();
+            String tt = (gpxList.get(nn)).getProvider();
             namesList.add(tt);
         }
 
-        final ListView lv = (ListView) findViewById(R.id.listname);
-        ArrayAdapter adapter = new ArrayAdapter<String>(this,android.R.layout.simple_list_item_1, namesList);
+        final ListView lv = findViewById(R.id.listname);
+        ArrayAdapter adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, namesList);
         lv.setAdapter(adapter);
 
         lv.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
@@ -105,7 +105,7 @@ public class Selectpos extends AppCompatActivity  {
                 Object Item = lv.getItemAtPosition(position);
                 wptname = Item.toString();
                 Log.d("TAG :", wptname);
-                new AlertDialog.Builder(mContext)
+                new AlertDialog.Builder(mContext, R.style.myALERT)
                         .setTitle("Delete wpt ?")
                         .setCancelable(false)
                         .setMessage(wptname)
@@ -124,13 +124,13 @@ public class Selectpos extends AppCompatActivity  {
                   //              CreerGpx();
                             }
                             //Reconstruit la liste des Wpts
-                            ArrayList<String> namesList = new ArrayList<String>();         // liste des Noms des Wpts
+                            ArrayList<String> namesList = new ArrayList<>();         // liste des Noms des Wpts
                             for (int nn = 0; nn < gpxList.size(); nn++) {
-                                String tt = ((Location) gpxList.get(nn)).getProvider();
+                                String tt = (gpxList.get(nn)).getProvider();
                                 namesList.add(tt);
                             }
-                            final ListView lv = (ListView) findViewById(R.id.listname);
-                            ArrayAdapter adapter = new ArrayAdapter<String>(mContext, android.R.layout.simple_list_item_1, namesList);
+                            final ListView lv = findViewById(R.id.listname);
+                            ArrayAdapter adapter = new ArrayAdapter<>(mContext, android.R.layout.simple_list_item_1, namesList);
                             lv.setAdapter(adapter);
                             }
                         })
@@ -326,7 +326,7 @@ public class Selectpos extends AppCompatActivity  {
     //Renvoie une Liste de nbWpts triés par distance croissante à (lat0/lng0)
     public static List<Location> decodeGPX(File file, Double lat0, Double lng0, int tridist) {
         //Liste des positions
-        List<Location> list = new ArrayList<Location>();
+        List<Location> list = new ArrayList<>();
         DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
         try {
             DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
@@ -364,12 +364,11 @@ public class Selectpos extends AppCompatActivity  {
                         newAlt_double = Double.parseDouble(newAlt);
                     }
                 }
-                //Si gps sport sans nom -> met extrait de la position
+                //Si Pas de nom -> affiche extrait de la position
                 if (wptname=="") {
                     if (newLat.length()>6) wptname= newLat.substring(0,7); else wptname= newLat;
                     if (newLon.length()>6) wptname+= "/"+newLon.substring(0,7); else wptname+= "/"+ newLon;
                 }
-
                 //stoc la Location dans la 'list'
                 Location newLocation = new Location(wptname);
                 newLocation.setLatitude(newLat_double);
@@ -382,9 +381,7 @@ public class Selectpos extends AppCompatActivity  {
             fileInputStream.close();
         } catch (ParserConfigurationException | FileNotFoundException e) {
             e.printStackTrace();
-        } catch (SAXException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 

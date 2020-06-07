@@ -16,6 +16,8 @@ import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.io.IOException;
+
 // Crée un service en tache de fond pour le Location Listener & ne pas arrêter les Updates ...
 public class LocService extends Service {
     public static final String BROADCAST_ACTION = "com.samblancat";
@@ -98,11 +100,16 @@ public class LocService extends Service {
             String[] nmeaSplit = nmea.split(",");
             //Capte le nb de sats de GGA
             if (nmeaSplit[0].equalsIgnoreCase("$GPGSV")) {
-                String txt=nmeaSplit[3];
-                Intent broadCastIntent = new Intent();
-                broadCastIntent.setAction("com.samblancat");
-                broadCastIntent.putExtra("Sat", txt);
-                sendBroadcast(broadCastIntent);
+                try {
+                    String txt = nmeaSplit[3];
+                    Intent broadCastIntent = new Intent();
+                    broadCastIntent.setAction("com.samblancat");
+                    broadCastIntent.putExtra("Sat", txt);
+                    sendBroadcast(broadCastIntent);
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
 
             //Capte la Speed de GGA

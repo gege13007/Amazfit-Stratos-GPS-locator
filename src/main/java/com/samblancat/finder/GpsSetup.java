@@ -1,15 +1,16 @@
 package com.samblancat.finder;
 
 import android.content.BroadcastReceiver;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.CountDownTimer;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.content.Context;
 import android.os.Bundle;
-
 import java.util.Random;
 
 public class GpsSetup extends AppCompatActivity {
@@ -23,9 +24,40 @@ public class GpsSetup extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        AlertDialog.Builder builder;
         setContentView(R.layout.waitgpsok);
         mContext = this;
+
+  /*      AlertDialog.Builder builder1 = new AlertDialog.Builder(GpsSetup.this, R.style.myALERT);
+        builder1.setTitle("Navigation");
+        builder1.setMessage("Continue or Stop ?");
+        builder1.setCancelable(false);
+        builder1.setPositiveButton("Continue",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        //Stop dialog
+                        dialog.dismiss();
+                        //Start Scanning Finder activity
+                    }
+                });
+        builder1.setNegativeButton("Stop",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        //Stop dialog
+                        dialog.dismiss();
+                        //Start Scanning Finder activity
+                    }
+                });
+        builder1.setNeutralButton("Stop nav",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        //Stop dialog
+                        dialog.dismiss();
+                    }
+                });
+        AlertDialog alert11 = builder1.create();
+        alert11.show();
+*/
 
         // on initialise le receiver de service/broadcast
         receiver = new MyReceiver();
@@ -34,28 +66,28 @@ public class GpsSetup extends AppCompatActivity {
         registerReceiver(receiver, intentFilter);
 
         // on lance le service
-        Intent I = new Intent(mContext, com.samblancat.finder.LocService.class);
-        mContext.startService(I);
+        Intent i = new Intent(mContext, com.samblancat.finder.LocService.class);
+        mContext.startService(i);
 
         Random r = new Random();
         ab = r.nextInt((190-90)+1)+90;
         dcap=6;
 
         //Lance le Countdown de 10sec minimum avant lancement main...
-        new CountDownTimer(10000, 50) {
+        new CountDownTimer(8000, 50) {
             public void onTick(long millisUntilFinished) {
                 TextView t=findViewById(R.id.progBarText);
                 int sec=Math.round(millisUntilFinished / 1000);
 
                 //Tourne la flèche
                 ImageView imgview;
-                imgview = (ImageView) findViewById(R.id.faisceau);
+                imgview = findViewById(R.id.faisceau);
                 imgview.setRotation((float) cap);
 
                 cap += dcap;
                 if (Math.abs(cap - ab)<7) {
                     Random r = new Random();
-                    ab = ab - dcap*(r.nextInt((28 - 12) + 1) + 12);
+                    ab = ab - dcap*(r.nextInt((30 - 12) + 1) + 12);
                     dcap=-dcap;
                 }
             }
@@ -67,9 +99,9 @@ public class GpsSetup extends AppCompatActivity {
                 startActivity(mainI);
                 finish();
             }
-
         }.start();
     }
+
 
     @Override
     protected void onDestroy() {
@@ -112,8 +144,8 @@ public class GpsSetup extends AppCompatActivity {
                 //Flag pour assurer un seul Main-activity
                 if (main_started == 0) {
                     main_started = 1;
-                    I = new Intent(GpsSetup.this, MainActivity.class);
-                    startActivity(I);
+                    i = new Intent(GpsSetup.this, MainActivity.class);
+                    startActivity(i);
                     finish();
                 }
             }
