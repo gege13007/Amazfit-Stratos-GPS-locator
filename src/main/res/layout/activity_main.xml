@@ -3,7 +3,6 @@
  -->
 
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginTop="10dp"
@@ -13,41 +12,52 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:background="#10101010"
         android:orientation="vertical"
         android:textAlignment="center">
+
         <TextView
             android:id="@+id/title"
             android:layout_width="match_parent"
-            android:layout_height="35dp"
+            android:layout_height="24dp"
             android:gravity="center"
             android:text="@string/app_name"
             android:textAppearance="@style/Base.TextAppearance.AppCompat.Large"
             android:textSize="18sp" />
+
         <TextView
             android:id="@+id/precistxt"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="@string/main_activity_content" />
+            android:text="@string/main_activity_content"
+            android:textSize="13sp" />
 
+        <TextView
+            android:id="@+id/posittxt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/posit0txt"
+            android:textSize="13sp" />
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="6dp"
             android:gravity="center_horizontal"
             android:orientation="horizontal">
 
             <ImageButton
                 android:layout_width="55dp"
-                android:layout_height="52dp"
-                android:layout_marginRight="15dp"
+                android:layout_height="50dp"
+                android:layout_marginEnd="15dp"
                 android:background="@drawable/settings"
                 android:onClick="setcmd" />
+
             <ImageButton
                 android:layout_width="55dp"
-                android:layout_height="52dp"
+                android:layout_height="50dp"
                 android:background="@drawable/readout32"
                 android:onClick="gotosavedpos" />
         </LinearLayout>
@@ -55,23 +65,23 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="6dp"
             android:gravity="center_horizontal"
             android:orientation="horizontal">
 
             <ImageButton
-                android:id="@+id/closebouton"
+                android:id="@+id/mapsbouton"
                 android:layout_width="57dp"
-                android:layout_height="57dp"
-                android:layout_marginRight="15dp"
-                android:background="@drawable/close"
-                android:onClick="closecmd" />
+                android:layout_height="56dp"
+                android:layout_marginEnd="15dp"
+                android:background="@drawable/icomap"
+                android:onClick="cartomaps" />
 
             <ImageButton
                 android:id="@+id/gotocmd"
-                android:layout_width="54dp"
-                android:layout_height="54dp"
-                android:background="@drawable/finder32"
+                android:layout_width="52dp"
+                android:layout_height="52dp"
+                android:background="@drawable/finder32red"
                 android:onClick="setposcmd" />
         </LinearLayout>
     </LinearLayout>

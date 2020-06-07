@@ -19,6 +19,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clickable="true"
+            android:longClickable="true"
             android:src="@drawable/boussole320"
             android:visibility="visible" />
 
@@ -65,7 +66,7 @@
             android:gravity="center"
             android:text="- m"
             android:textColor="@android:color/holo_green_light"
-            android:textSize="30sp"
+            android:textSize="26sp"
             android:textStyle="bold"
             android:typeface="normal" />
 
