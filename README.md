@@ -96,5 +96,4 @@ Change log
 24/05/2020 Version 3 - many fix & Map
 2/06/2020  Version 4 - Long click on Maps and many fixs
 05/06/2020 Version 4.2 - modif on stop app !
-
-./2020 What's left to do - make Beautiful styled Alert Dialog box - Display Speed ? - Mode Golf ? 
+07/06/2020 Version 4.4 - mini modif affich, alertdialog...
