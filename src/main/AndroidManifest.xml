@@ -16,9 +16,9 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/radaricon"
+        android:icon="@mipmap/carticon"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme">
+        android:theme="@style/myTheme">
         <service
             android:name="com.samblancat.finder.LocService"
             android:exported="false"
@@ -40,8 +40,6 @@
         <activity android:name=".reglages">
         </activity>
         <activity android:name=".Carto">
-        </activity>
-        <activity android:name=".cartodraw">
         </activity>
     </application>
 
