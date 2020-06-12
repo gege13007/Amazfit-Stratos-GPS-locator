@@ -103,4 +103,6 @@ Change log
 
 08/06/2020 V4.5 - Bug fix on start-up
 
+12/06/2020 v4.6 - Improve display on different screen dimensions (SUUNTO)
+
 
