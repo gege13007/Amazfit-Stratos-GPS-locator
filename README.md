@@ -105,4 +105,7 @@ Change log
 
 12/06/2020 v4.6 - Improve display on different screen dimensions (SUUNTO)
 
+13/06/2020 - Possible bug fix with gpx display on cartodraw
+
+
 
