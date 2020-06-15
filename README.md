@@ -1,7 +1,7 @@
 # Android Wear GPS OpenStreet Maps & GPX reader
 Simple &amp; effective GPS locator app for Amazfit Xiaomi android wear
 ------------------------------------------------------------------------------
-Here is the last version of GPS Maps & compass Locator for Wear Android (tested on Xiaomi Amazfit Stratos 2, PACE... but must be fine on many others). My first idea was to make a simple position reminder with a compass display, or may be a Golf Gps watch. We have now a Gpx file and Open Street Map viewer.
+Here is the last version of GPS Maps & compass Locator for Wear Android (tested on Xiaomi Amazfit Stratos 2, Stratos 3, PACE, and SUUNTO...). My first idea was to make a simple position reminder with a compass display, or a Golf Gps watch. We have now a Gpx file viewer with Open Street Maps, that's fine.
 
 This app includes 4 main windows :
 
@@ -61,7 +61,10 @@ Don't worry about that, just download and run 'MOBILE ATLAS CREATOR' ( https://m
 
 Click on 'Nouvel Atlas' (OSMdroid ZIP). With the checkboxes on the left you must select the zoom level to include in your atlas.
 The level 15 includes small details and is not available for every country or cities. The level 15 represent a 2X size of datas than zoom 14, and 4X than zoom 13. So don't try to select the entire world on zoom level 14 !
+
+Click to valid the checkbox 'Recreer/Ajuster tuiles' !
 Click 'Ajouter a la selection', and 'Creer Atlas'.
+
 Unzip the file, and copy all repertories to your wear ("/OSMaps").
 You must have something like this.
 
@@ -105,7 +108,11 @@ Change log
 
 12/06/2020 v4.6 - Improve display on different screen dimensions (SUUNTO)
 
-13/06/2020 - Possible bug fix with gpx display on cartodraw
+13/06/2020 v4.6.2 - Possible bug fix with gpx display on cartodraw
+
+15/06/2020 v4.6.3 - Modif display on Suunto 
+
+
 
 
 
