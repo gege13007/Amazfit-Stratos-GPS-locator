@@ -110,7 +110,7 @@ Change log
 
 13/06/2020 v4.6.2 - Possible bug fix with gpx display on cartodraw
 
-15/06/2020 v4.6.3 - Modif display on Suunto 
+15/06/2020 v4.6.4 - Modif 2 display on Suunto / bug fix on delete waypoint 
 
 
 
