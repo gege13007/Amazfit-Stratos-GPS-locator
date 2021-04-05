@@ -16,7 +16,7 @@
     <Spinner
         android:id="@+id/gpxlist"
         android:layout_width="wrap_content"
-        android:layout_height="30dp"
+        android:layout_height="32dp"
         android:layout_gravity="center"
         android:layout_margin="2dp"
         android:background="@drawable/button_bg"
