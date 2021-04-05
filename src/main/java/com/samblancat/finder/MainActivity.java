@@ -328,10 +328,10 @@ public class MainActivity extends AppCompatActivity {
 
                 if (satok > 0) {
                     //ici ne pas faire la.isempty() ou la.length>0 !!!
-                    try { precis = 7 * Double.parseDouble(dop);
+                    try { precis = 4 * Double.parseDouble(dop);    // 6 ?
                     } catch (Exception e) { precis = 99.0; }
                     String t = new DecimalFormat("##0").format(precis);
-                    ptxt.setText("Precision" + t + "m");
+                    ptxt.setText("Precision " + t + "m");
                     img.setBackgroundResource(R.drawable.finder32);
                 } else {
                     ptxt.setText(R.string.waitgps);
@@ -371,9 +371,13 @@ public class MainActivity extends AppCompatActivity {
                 mylng0 = mylng;
 
                 TextView postxt = findViewById(R.id.posittxt);
-                String t = new DecimalFormat("##0.0000").format(mylat);
-                t += "°/" + new DecimalFormat("##0.0000").format(mylng) + "°";
-                postxt.setText(t);
+                if (satok > 0) {
+                    String t = new DecimalFormat("##0.0000").format(mylat);
+                    t += "°/" + new DecimalFormat("##0.0000").format(mylng) + "°";
+                    postxt.setText(t);
+                }
+                else
+                    postxt.setText("...");
             }
         }
     }

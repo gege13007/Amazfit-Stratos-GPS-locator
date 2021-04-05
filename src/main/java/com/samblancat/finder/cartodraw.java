@@ -3,6 +3,7 @@ package com.samblancat.finder;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -13,37 +14,40 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.location.Location;
+import android.media.MediaScannerConnection;
 import android.os.Environment;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
-import android.view.ContextThemeWrapper;
 import android.view.View;
-import android.view.WindowManager;
-import android.widget.TextView;
 import android.widget.Toast;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import static android.content.Context.MODE_PRIVATE;
+import static android.graphics.Color.rgb;
 import static com.samblancat.finder.Selectpos.decodeGPX;
 
 public class cartodraw extends View {
-    public Double wx , wy, cx, cy;
-    public double altmax, altmin, altspan;
-    public double altmoy;
+    public double wx , wy, cx, cy;
+    public double altmax, altmin, altspan, altmoy;
     public double pixdegX, pixdegY;
     //dernière position Réelle
     public double dlat, dlon;
     //Position géo centre de l'écran
     public double clat, clon;
     //pos si nav
-    public  double mylat0, mylng0;
+    public double mylat0, mylng0;
     public String wptname="";
     public SharedPreferences sharedPref;
-    public String gpxini;
+    //Track visualisée
     List<Location> gpxList=null;
+    //nb de wpt dans liste en cours
+    public int nbwpt=0;
     Context mContext;
     public int xtile, ytile, zoom;
     int bmp_x = 2;
@@ -58,14 +62,14 @@ public class cartodraw extends View {
 
         //Reprend le Gpx de base
         sharedPref = mContext.getSharedPreferences("POSPREFS", MODE_PRIVATE);
-        gpxini = sharedPref.getString("gpxini","gpxlocator.gpx");
+        glob.gpxini = sharedPref.getString("gpxini","gpxlocator.gpx");
 
-        try { zoom = sharedPref.getInt("zoom", 7);
-        //Retrouve last Position courante pour tri / distances
-        clat = sharedPref.getFloat("clat", 43);
-        clon = sharedPref.getFloat("clon",5);
+        try { zoom = sharedPref.getInt("zoom", 9);
+          //Retrouve last Position courante pour tri / distances
+          clat = sharedPref.getFloat("clat", (float) 43.3);
+          clon = sharedPref.getFloat("clon", (float) 5.2);
         } catch (Exception e) {
-            zoom = 8;
+            zoom = 9;
             clat = 43;
             clon = 5;
         }
@@ -74,24 +78,24 @@ public class cartodraw extends View {
         File dir0 = new File(Environment.getExternalStorageDirectory().toString()+"/gpxdata");
         String path0 = dir0.toString();
         if ( !dir0.exists() ) return;
-        String path = path0 +"/" + gpxini;
+        String path = path0 +"/" + glob.gpxini;
         final File gpxFile = new File(path);
 
+        //Largeur et centre de l'écran
         wx = (double) getResources().getDisplayMetrics().widthPixels;
         wy = (double) getResources().getDisplayMetrics().heightPixels;
-
         cx = wx/2;
         cy = wy/2;
 
         //Retrouve last position réelle
-        dlat = sharedPref.getFloat("dlat", 43);
-        dlon = sharedPref.getFloat("dlng",5);
-        mylat0 = sharedPref.getFloat("lat0", 0);
-        mylng0 = sharedPref.getFloat("lng0", 0);
+        dlat = sharedPref.getFloat("dlat",  (float) 43.3);
+        dlon = sharedPref.getFloat("dlng",(float) 5.2);
+        mylat0 = sharedPref.getFloat("lat0",  (float) 43.3);
+        mylng0 = sharedPref.getFloat("lng0", (float) 5.2);
         wptname = sharedPref.getString("nom", "");
 
         // Extrait la liste Array des 'name'
-        gpxList = decodeGPX(gpxFile, dlat, dlon, 0);  // pas de tri !
+        gpxList = decodeGPX(gpxFile, dlat, dlon, 0);    // pas de tri wpt !
 
         altmin=9999; altmax=-9999;
         //Calc echelle & altit moyenne
@@ -103,7 +107,7 @@ public class cartodraw extends View {
         }
         altmoy=(altmax+altmin)/2;
         altspan=(altmax-altmin)/2;
-
+//        Log.d("cartok: ", "lsize="+gpxList.size());
         setKeepScreenOn(true);
     }
 
@@ -111,10 +115,11 @@ public class cartodraw extends View {
     @SuppressLint("DrawAllocation")
     @Override
     protected void onDraw(Canvas canvas) {
-        float oldx= (float) 0;
-        float oldy= (float) 0;
-        int first=0;
+        float oldx = (float) 0;
+        float oldy = (float) 0;
+        int first = 0;
         double x, y, z;
+        Calendar c;
 
         //------------  AFFICHAGE DES TILES OSMap / Centre de l'Ecran  ---------------
         // Calcul des Dimensions tiles & scale
@@ -123,17 +128,17 @@ public class cartodraw extends View {
         wtiley = wtilex * Math.cos(Math.toRadians(dlat)); //  clat ? * 0.94444444
 
         //ReCalc de scale 'pixdeg' 256*2 -> 512 pix
-        pixdegX = (bmp_x*256) / wtilex;
-        pixdegY = (bmp_x*256) / wtiley;
+        pixdegX = (bmp_x * 256) / wtilex;
+        pixdegY = (bmp_x * 256) / wtiley;
 
         //Trouve tile centrale du centre écran
-        double xt = Math.floor((n*(clon+180))/360);
+        double xt = Math.floor((n * (clon + 180)) / 360);
         xtile = (int) xt;
         double la = Math.toRadians(clat);
-        double yt = Math.tan(la)+(1/Math.cos(la));
-        yt = 1 - ((Math.log(yt))/Math.PI);
-        yt = (yt*n)/2;
-        ytile = (int)(Math.rint(yt));
+        double yt = Math.tan(la) + (1 / Math.cos(la));
+        yt = 1 - ((Math.log(yt)) / Math.PI);
+        yt = (yt * n) / 2;
+        ytile = (int) (Math.rint(yt));
 
 //        Log.d("Screen?", " ");
 //        Log.d("Screen?", "xtile="+ xtile +" ytile="+ ytile);
@@ -142,82 +147,130 @@ public class cartodraw extends View {
         getTile(canvas, xtile, ytile);
 
         //Test si manque un côté ?
-        if (x0+(bmp_x*256) < wx)             // NOIR à Droite
-            drawTile(canvas,xtile + 1, ytile,x0+(bmp_x*256),y0);
+        if (x0 + (bmp_x * 256) < wx)             // NOIR à Droite
+            drawTile(canvas, xtile + 1, ytile, x0 + (bmp_x * 256), y0);
         if (x0 > 1)                           // NOIR à Gauche
-            drawTile(canvas,xtile - 1, ytile,x0-(bmp_x*256),y0);
-        if (y0+(bmp_x*256)<wy)              // NOIR en Bas
-            drawTile(canvas, xtile, ytile + 1, x0,y0+(bmp_x*256));
+            drawTile(canvas, xtile - 1, ytile, x0 - (bmp_x * 256), y0);
+        if (y0 + (bmp_x * 256) < wy)              // NOIR en Bas
+            drawTile(canvas, xtile, ytile + 1, x0, y0 + (bmp_x * 256));
         if (y0 > 1)                          // NOIR en Haut
-            drawTile(canvas, xtile , ytile - 1, x0,y0-(bmp_x*256));
+            drawTile(canvas, xtile, ytile - 1, x0, y0 - (bmp_x * 256));
         // Si Manque un bloc en Coin ?
-        if ((x0+(bmp_x*256)<wx) && (y0>1))              // NOIR en Haut à Droite
-            drawTile(canvas,xtile + 1, ytile-1, x0+(bmp_x*256),y0-(bmp_x*256));
+        if ((x0 + (bmp_x * 256) < wx) && (y0 > 1))              // NOIR en Haut à Droite
+            drawTile(canvas, xtile + 1, ytile - 1, x0 + (bmp_x * 256), y0 - (bmp_x * 256));
         if ((x0 > 1) && (y0 > 1))                       // NOIR en Haut à Gauche
-            drawTile(canvas,xtile - 1, ytile-1, x0-(bmp_x*256),y0-(bmp_x*256));
-        if ((x0 > 1) && (y0+(bmp_x*256)<wy))            // NOIR en Bas à Gauche
-            drawTile(canvas,xtile-1, ytile + 1, x0-(bmp_x*256),y0+(bmp_x*256));
-        if ((x0+(bmp_x*256)<wx)&&(y0+(bmp_x*256)<wy))    // NOIR en bas à Droite
-            drawTile(canvas,xtile+1 , ytile + 1, x0+(bmp_x*256),y0+(bmp_x*256));
+            drawTile(canvas, xtile - 1, ytile - 1, x0 - (bmp_x * 256), y0 - (bmp_x * 256));
+        if ((x0 > 1) && (y0 + (bmp_x * 256) < wy))            // NOIR en Bas à Gauche
+            drawTile(canvas, xtile - 1, ytile + 1, x0 - (bmp_x * 256), y0 + (bmp_x * 256));
+        if ((x0 + (bmp_x * 256) < wx) && (y0 + (bmp_x * 256) < wy))    // NOIR en bas à Droite
+            drawTile(canvas, xtile + 1, ytile + 1, x0 + (bmp_x * 256), y0 + (bmp_x * 256));
 
-        //---------------   TRACE    DES   GPX   -----------------
+        //---------------  TRACE en mode VISU GPX  -----------------
         Paint paint = new Paint();
         paint.setAntiAlias(true);
-        paint.setStrokeWidth(1);
+        paint.setStrokeWidth(2);
 
-        //Display points
-        int nbwpt = gpxList.size();
-        //Increment de point à point
-        int wptmodulo = 1;
-        //Reduit le nb de points affichés à 200 maxi
-        if (nbwpt>100) wptmodulo = (int) Math.floor(nbwpt / 200.0);
-        double[] wptX = new double[nbwpt];
-        double[] wptY = new double[nbwpt];
-        double[] wptZ = new double[nbwpt];
-        int nwptvis = 0;
-        for (int nn = 0, countname=0; nn < nbwpt; nn+=wptmodulo, countname++) {
-            Location loc = gpxList.get(nn);
-            wptX[nn] = cx + (loc.getLongitude()-clon)*pixdegX;
-            wptY[nn] = cy - (loc.getLatitude()-clat)*pixdegY;
-            wptZ[nn] = loc.getAltitude();
-            //compte les pts vraiment visibles
-            if ( (wptX[nn]>0)&&(wptX[nn]<wx)&&(wptY[nn]>0)&&(wptY[nn]<wy) ) nwptvis++;
-        }
-
-        //Adapte nb display de wptnames max 1/8 nb de wpt visibles
-        int namodulo = Math.round(nwptvis >> 3);
-        //Dessin des points définitif
-        for (int nn = 0, countname=0; nn < nbwpt; nn+=wptmodulo, countname++) {
-            Location loc = gpxList.get(nn);
-            x = wptX[nn];
-            y = wptY[nn];
-            z = wptZ[nn];
-            //Pset le waypoint
-            if ( (x>0)&&(x<wx)&&(y>0)&&(y<wy) ) {
-                int rr=0, bb=0, gg;
-                gg = (int) (255*((altspan - Math.abs(z-altmoy))/altspan));
-                if (z>altmoy) rr = (int) (255*(z-altmoy)/(altspan));
-                else bb = (int) (255*(altmoy-z)/(altspan));
-                paint.setColor(Color.rgb(rr,gg,bb));
-                paint.setStyle(Paint.Style.FILL);
-                canvas.drawCircle(Math.round(x), Math.round(y), 3, paint);
+        if ((!glob.tracking) && (gpxList != null)) {
+            //Display points
+            nbwpt = gpxList.size();
+            //Increment de point à point
+            int wptmodulo = 1;
+            //Reduit le nb de points affichés à 200 maxi
+            if (nbwpt > 100) wptmodulo = (int) Math.floor(nbwpt / 200.0);
+            if (wptmodulo < 1) wptmodulo = 1;
+            double[] wptX = new double[nbwpt];
+            double[] wptY = new double[nbwpt];
+            double[] wptZ = new double[nbwpt];
+            int nwptvis = 0;
+            for (int nn = 0, countname = 0; nn < nbwpt; nn += wptmodulo, countname++) {
+                Location loc = gpxList.get(nn);
+                wptX[nn] = cx + (loc.getLongitude() - clon) * pixdegX;
+                wptY[nn] = cy - (loc.getLatitude() - clat) * pixdegY;
+                wptZ[nn] = loc.getAltitude();
+                //compte les pts vraiment visibles
+                if ((wptX[nn] > 0) && (wptX[nn] < wx) && (wptY[nn] > 0) && (wptY[nn] < wy))
+                    nwptvis++;
             }
-            //Trace une droite ?
-            paint.setStyle(Paint.Style.STROKE);
-            if ( first>0 ) canvas.drawLine(oldx, oldy, (float)x, (float)y, paint);
-            oldx=(float)x; oldy=(float)y;
-            first=1;
-            //Met le wptname ? (10 au maximum)
-            if (countname > namodulo) countname=0;
-            if (countname<1) {
-                String wn = loc.getProvider();
-                //N'AFFICHE PAS les noms du type "43.2210/5.2550"
-                if (!wn.contains("/")) {
-                    paint.setColor(Color.BLACK);
+
+            //Adapte nb display de wptnames max 1/8 nb de wpt visibles
+            int namodulo = Math.round(nwptvis >> 3);
+            //Dessin des points définitifs
+            for (int nn = 0, countname = 0; nn < nbwpt; nn += wptmodulo, countname++) {
+                Location loc = gpxList.get(nn);
+                x = wptX[nn];
+                y = wptY[nn];
+                z = wptZ[nn];
+                //Pset le waypoint
+                if ((x > 0) && (x < wx) && (y > 0) && (y < wy)) {
+                    int rr = 0, bb = 0, gg;
+                    gg = (int) (255 * ((altspan - Math.abs(z - altmoy)) / altspan));
+                    if (z > altmoy) rr = (int) (255 * (z - altmoy) / (altspan));
+                    else bb = (int) (255 * (altmoy - z) / (altspan));
+                    paint.setColor(rgb(rr, gg, bb));
                     paint.setStyle(Paint.Style.FILL);
-                    paint.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
-                    paint.setTextSize(19);
-                    canvas.drawText(wn, (float) x - 20, (float) y - 19, paint);
+                    canvas.drawCircle(Math.round(x), Math.round(y), 3, paint);
+                }
+                //Trace une droite ?
+                paint.setColor(rgb(0x70, 0x70, 0x70));
+                if (first > 0) canvas.drawLine(oldx, oldy, (float) x, (float) y, paint);
+                oldx = (float) x;
+                oldy = (float) y;
+                first = 1;
+                //Met le wptname ? (10 au maximum)
+                if (countname > namodulo) countname = 0;
+                if (countname < 1) {
+                    String wn = loc.getProvider();
+                    //N'AFFICHE PAS les noms du type "43.2210/5.2550"
+                    if (!wn.contains("/")) {
+                        paint.setColor(rgb(0x70, 0x70, 0x70));
+                        paint.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
+                        paint.setTextSize(19);
+                        canvas.drawText(wn, (float) x - 20, (float) y - 19, paint);
+                    }
+                }
+            }
+        }
+        //------------------ TRACE Tracking en LIVE ---------------------------
+        else if (glob.mygpxList != null) {
+            //Display points
+            nbwpt = glob.mygpxList.size();
+            if (nbwpt > 1) {
+                //Increment de point à point
+                int wptmodulo = 1;
+                //Reduit le nb de points affichés à 200 maxi
+                if (nbwpt > 100) wptmodulo = (int) Math.floor(nbwpt / 200.0);
+                if (wptmodulo < 1) wptmodulo = 1;
+                double[] wptX = new double[nbwpt];
+                double[] wptY = new double[nbwpt];
+                int nwptvis = 0;
+                for (int nn = 0; nn < nbwpt; nn += wptmodulo) {
+                    Location loc = glob.mygpxList.get(nn);
+                    wptX[nn] = cx + (loc.getLongitude() - clon) * pixdegX;
+                    wptY[nn] = cy - (loc.getLatitude() - clat) * pixdegY;
+                    //compte les pts vraiment visibles
+                    if ((wptX[nn] > 0) && (wptX[nn] < wx) && (wptY[nn] > 0) && (wptY[nn] < wy))
+                        nwptvis++;
+                }
+
+                //Adapte nb display de wptnames max 1/8 nb de wpt visibles
+                int namodulo = Math.round(nwptvis >> 3);
+                //Dessin des points
+                for (int nn = 0; nn < nbwpt; nn += wptmodulo) {
+                    Location loc = glob.mygpxList.get(nn);
+                    x = wptX[nn];
+                    y = wptY[nn];
+                    //Pset le waypoint
+                    if ((x > 0) && (x < wx) && (y > 0) && (y < wy)) {
+                        paint.setColor(Color.BLUE);
+                        paint.setStyle(Paint.Style.FILL);
+                        canvas.drawCircle(Math.round(x), Math.round(y), 2, paint);
+                    }
+                    //Trace une droite ?
+                    paint.setStyle(Paint.Style.STROKE);
+                    if (first > 0) canvas.drawLine(oldx, oldy, (float) x, (float) y, paint);
+                    oldx = (float) x;
+                    oldy = (float) y;
+                    first = 1;
                 }
             }
         }
@@ -225,14 +278,22 @@ public class cartodraw extends View {
         //Met POINT sur la position courante ?
         x = cx + (dlon - clon) * pixdegX;
         y = cy - ((dlat - clat) * pixdegY);
-        if ( (x>0)&&(x<wx)&&(y>0)&&(y<wy) ) {
+        if ((x > 0) && (x < wx) && (y > 0) && (y < wy)) {
             //Pset le point actuel réel
-            if (dlat!=0) paint.setColor(Color.BLUE); else paint.setColor(Color.RED);
+            if (glob.gpsfix != 0) paint.setARGB(0xe0, 0x10, 0x10, 0x10);
+            else paint.setColor(Color.RED);
             paint.setStyle(Paint.Style.STROKE);
             paint.setStrokeWidth(3);
             canvas.drawCircle(Math.round(x), Math.round(y), 7, paint);
-            canvas.drawLine((float) (x - 9), (float) (y), (float) (x + 9), (float) (y), paint);
-            canvas.drawLine((float) (x), (float) (y - 9), (float) (x), (float) (y + 9), paint);
+            canvas.drawLine((float) (x - 12), (float) (y), (float) (x + 12), (float) (y), paint);
+            canvas.drawLine((float) (x), (float) (y - 12), (float) (x), (float) (y + 12), paint);
+        }
+
+        //Recentrage auto en mode track saving
+        if (glob.mygpxList != null) {
+            if ( (Math.abs(x -cx) + Math.abs(y-cy)) > (cx+cy)/2.2 ) {
+                centermap();
+            }
         }
 
         //Dessine Trait à Destination ?
@@ -240,16 +301,19 @@ public class cartodraw extends View {
             double x2 = cx + (mylng0 - clon) * pixdegX;
             double y2 = cy - ((mylat0 - clat) * pixdegY);
             //Pset le point actuel réel
-            paint.setStyle(Paint.Style.STROKE);
-            paint.setColor(Color.BLUE);
-            paint.setStrokeWidth(2);
-            canvas.drawLine((float) (x), (float) (y), (float) (x2), (float) (y2), paint);
-            canvas.drawCircle(Math.round(x2), Math.round(y2), 5, paint);
+            Paint paint2 = new Paint();
+            paint2.setStyle(Paint.Style.STROKE);
+            paint2.setColor(Color.BLUE);
+            paint2.setStrokeWidth(2);
+   //         paint2.setPathEffect(new DashPathEffect(new float[]{10,10},20));
+   //         paint2.setAntiAlias(true);
+            canvas.drawLine((float) (x), (float) (y), (float) (x2), (float) (y2), paint2);
+            canvas.drawCircle(Math.round(x2), Math.round(y2), 6, paint);
         }
 
         Rect rt = new Rect(0, (int)Math.round(wy-68), (int)Math.round(wx), (int)Math.round(wy));
         paint.setColor(Color.WHITE);
-        paint.setAlpha(105);
+        paint.setAlpha(100);
         paint.setStyle(Paint.Style.FILL);
         canvas.drawRect(rt, paint);
 
@@ -258,7 +322,14 @@ public class cartodraw extends View {
         paint.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
         paint.setStyle(Paint.Style.FILL);
         paint.setTextSize(45);
-        canvas.drawText("-          +", (float) (cx-66), (float) (wy - 8), paint);
+        canvas.drawText("-          +", (float) (cx-66), (float) (wy - 15), paint);
+        //Affiche l'heure en haut
+        c = Calendar.getInstance();
+        SimpleDateFormat df = new SimpleDateFormat("HH:mm");
+        paint.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
+        paint.setTextSize(22);
+        canvas.drawText(df.format(c.getTime()), (float) (cx-26), (float) (28), paint);
+
         //Center picto
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(2);
@@ -284,44 +355,91 @@ public class cartodraw extends View {
             if (km < 10) tp = new DecimalFormat("0.00").format(km)+" km";
             else tp = new DecimalFormat("###0").format(km)+" km";
         }
-        canvas.drawText(tp, (float) 50, (float) (wy - 49), paint);
-        canvas.drawText(Integer.toString(zoom), (float) (wx-74), (float) (wy - 49), paint);
 
-        //Trace la règle
+        //hauteur de la regle du bas
+        float ry =  (float)((wx+wy)*0.408);
+        canvas.drawText(tp, (float) 50, (float) (ry - 3), paint);
+        canvas.drawText(Integer.toString(zoom), (float) (wx-74), ry - 3, paint);
+
+        //Trace la règle du bas
         paint.setStrokeWidth(2);
-        float r0 = 53f;
-        float r1 = (float)(r0+regle);
-        canvas.drawLine(r0, (float)(wy-46), r1, (float)(wy-46), paint);
-        canvas.drawLine(r0, (float)(wy-46), r0, (float)(wy-40), paint);
-        canvas.drawLine(r1, (float)(wy-46), r1, (float)(wy-40), paint);
+        float r0 = (float)(cx-(regle / 2));
+        float r1 = (float)(cx+(regle / 2));
+        canvas.drawLine(r0, ry, r1, ry, paint);
+        canvas.drawLine(r0, ry, r0, ry+4, paint);
+        canvas.drawLine(r1, ry, r1, ry+4, paint);
+
+        //-------------------------------------------------------
+        //Aff données sur MAP incrustation 1
+        if (glob.modevue==1) {
+            paint.setColor(rgb(0, 0, 65));
+            paint.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
+            //Affiche Vitesse km/h
+            ry = (float) (wy * 0.36);
+            paint.setTextSize(20);
+            canvas.drawText("Spd", (float) (cx-90), ry-20, paint);
+            paint.setTextSize(48);
+            String vt = new DecimalFormat("0.0").format(glob.realspeed);
+            if (glob.gpsfix>0)
+                canvas.drawText(vt+" km/h", (float) (cx-64), ry, paint);
+            else
+                canvas.drawText("- km/h", (float) (cx-64), ry, paint);
+
+            //Distance cumulée track
+            if (glob.tracking){
+                paint.setTextSize(20);
+                canvas.drawText("Dst", (float) (cx-85), ry+30, paint);
+                paint.setTextSize(48);
+                vt = glob.dtotext(glob.realdist);
+                canvas.drawText(vt, (float) (cx - 60), ry+50, paint);
+            }
+
+            //Altitude
+            paint.setTextSize(20);
+            canvas.drawText("Alt", (float) (cx-85), ry+80, paint);
+            paint.setTextSize(48);
+            vt = glob.dtotext(glob.lastalt);
+            if (glob.gpsfix>0)
+              canvas.drawText(vt, (float) (cx - 60), ry+100, paint);
+            else
+              canvas.drawText("- m", (float) (cx - 60), ry+100, paint);
+        }
     }
 
 
     //Va charger la tile0 et retourne le Bitmap resizé !
     //Calcule les x0/y0 coin haut & gauche de la tile centrale
-    public boolean getTile(Canvas canvas, int xtil, int ytil) {
+    public void getTile(Canvas canvas, int xtil, int ytil) {
         Bitmap myBitmap;
+        int cote;
+
         //Test si gpxdata existe
         File dir0 = new File(Environment.getExternalStorageDirectory().toString()+"/OSMaps");
         String path0 = dir0.toString();
         if ( !dir0.exists() ) {
             Toast.makeText(mContext, "No 'OSMaps' directory !", Toast.LENGTH_LONG).show();
-            return false;
+            return;
         }
+
         String tilename = path0 + "/" + zoom + "/" + xtil + "/" + ytil + ".png";
         File file = new File(tilename);
         if (file.exists()) {
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inPreferredConfig = Bitmap.Config.ARGB_8888;
             myBitmap = (BitmapFactory.decodeFile(new File(tilename).getPath(), options));
-        } else
+            cote = 256;
+        } else {
+            //si rien met les carreaux
             myBitmap = (BitmapFactory.decodeResource(getContext().getResources(), R.drawable.emptytile256));
+            cote = 256;
+        }
+
         // CREATE A MATRIX FOR THE MANIPULATION
         Matrix matrix = new Matrix();
         // RESIZE THE BIT MAP
         matrix.postScale((float) bmp_x, (float) bmp_x);
         Bitmap sizedBitmap = Bitmap.createBitmap(
-                myBitmap, 0, 0, 256, 256, matrix, false);
+                myBitmap, 0, 0, cote, cote, matrix, false);
         myBitmap.recycle();
 
         // Retrouve lat/lon coin haut/gauche de la tile (glat / glon)
@@ -332,11 +450,10 @@ public class cartodraw extends View {
         glat = Math.toDegrees(glat);
 
         //Calc pos Pixels de la tile0 (haut/gauche) (256*2 -> 512*512 pixels png)
-        x0 = (float) (cx - 256 *(bmp_x*(clon - glon))/wtilex );
-        y0 = (float) (cy + 256 *(bmp_x*(clat - glat))/wtiley );
+        x0 = (float) (cx - cote *(bmp_x*(clon - glon))/wtilex );
+        y0 = (float) (cy + cote *(bmp_x*(clat - glat))/wtiley );
         //Dessine la Tile 0
         canvas.drawBitmap(sizedBitmap, x0, y0, null);
-        return true;
     }
 
 
@@ -372,6 +489,7 @@ public class cartodraw extends View {
     }
 
 
+   //Rafraichis la carte avec dlat / dlon
     public void updateData(double dy, double dx) {
         dlat = dy;
         dlon = dx;
@@ -379,22 +497,19 @@ public class cartodraw extends View {
     }
 
 
+    //MENU CHOIX si NEW WPT / NEW TRACK / Annuler
     public void StoreNewWpt(double dx, double dy) {
     final double nX, nY;
-
         nX = clon + ((dx - cx) / pixdegX);
         nY = clat + ((cy - dy) / pixdegY);
-
- //       String togo = new DecimalFormat("#0.0000").format(nY);
-  //      togo += "/" + new DecimalFormat("##0.0000").format(nX);
-  //      Toast.makeText(mContext, "Goto " + togo, Toast.LENGTH_LONG).show();
+  //     Toast.makeText(mContext, "Goto " + togo, Toast.LENGTH_LONG).show();
 
         //Demande confirmation
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext, R.style.myALERT);
-        builder.setTitle("Set mark");
+        builder.setTitle("New track/wpt");
         builder.setCancelable(false);
-        builder.setMessage("New dest or new Wpt ?");
-        builder.setPositiveButton("New Nav", new DialogInterface.OnClickListener() {
+        builder.setMessage("Store new Wpt or new Track ?");
+        builder.setPositiveButton("New Wpt", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
                 //Met le wptname
                 SharedPreferences.Editor editor = sharedPref.edit();
@@ -408,26 +523,87 @@ public class cartodraw extends View {
                 wptname = df.format(c.getTime());
                 editor.putString("nom", wptname);
                 editor.apply();
+                glob.appendGPX(mContext, mylat0, mylng0, glob.lastalt, glob.gpxini);
+                Toast.makeText(mContext, "New Wpt to go saved to " + glob.gpxini, Toast.LENGTH_LONG).show();
                 dialog.dismiss();
             }
         });
-        builder.setNegativeButton("New Waypoint", new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                //Store new Wpt
-                mylat0 = nY;
-                mylng0 = nX;
-                dialog.dismiss();
-            }
-        });
+        if (!glob.tracking) {
+            builder.setNegativeButton("Start new Track", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    glob.tracking = true;
+                    //start list
+                    glob.mygpxList = new ArrayList<>();
+                    //First point
+                    glob.lastlat=dlat;
+                    glob.lastlon=dlon;
+                    //Sauve mode Tracking en cours
+                    SharedPreferences.Editor editor = sharedPref.edit();
+                    editor.putInt("track", 1);
+                    editor.apply();
+                    dialog.dismiss();
+                }
+            });
+        } else {
+            builder.setNegativeButton("Stop Track", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
+                    //Demande confirmation Stop tracking save ?
+                    AlertDialog.Builder builder = new AlertDialog.Builder(mContext, R.style.myALERT);
+                    builder.setTitle("Stop track");
+                    builder.setCancelable(false);
+                    builder.setMessage("Save new Track ?");
+                    builder.setPositiveButton("Save Gpx", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            //Sauve la track
+                            glob.tracking = false;
+                            //Store new GPX Wpt file
+                            Calendar c = Calendar.getInstance();
+                            SimpleDateFormat df = new SimpleDateFormat("yyyyMMdd-hhmmss");
+                            String formatdate = df.format(c.getTime());
+                            String nom = "gs" + "-" + formatdate + ".gpx";
+                            WriteMyGPX(nom);
+                            //Sauve Fin de Tracking
+                            SharedPreferences.Editor editor = sharedPref.edit();
+                            editor.putInt("track", 0);
+                            //sauve comme nouveau gpxini
+                            editor.putString("gpxini", nom);
+                            glob.gpxini = nom;
+                            editor.apply();
+                            dialog.dismiss();
+                            //Aff les stats de track
+                            Intent intent = new Intent(mContext, statsgpx.class);
+                            mContext.startActivity(intent);
+                        }
+                    });
+                    builder.setNegativeButton("Discard track", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            glob.tracking = false;
+                            //Sauve Fin de Tracking
+                            SharedPreferences.Editor editor = sharedPref.edit();
+                            editor.putInt("track", 0);
+                            editor.apply();
+                            dialog.dismiss();
+                        }
+                    });
+                    //Annuler
+                    builder.setNeutralButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+                    AlertDialog alert11 = builder.create();
+                    alert11.show();
+                }
+            });
+        }
         builder.setNeutralButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
-                //Annuler
-                dialog.dismiss();
+            //Annuler
+            dialog.dismiss();
             }
         });
-        AlertDialog alert11 = builder.create();
-        alert11.show();
-
+        AlertDialog alert12 = builder.create();
+        alert12.show();
         invalidate();
     }
 
@@ -441,6 +617,7 @@ public class cartodraw extends View {
         editor.apply();
         invalidate();
     }
+
 
     public void shift(double dx, double dy) {
         clat += dy/pixdegY;
@@ -457,9 +634,10 @@ public class cartodraw extends View {
         invalidate();
     }
 
+
     public void zoomin() {
-        //Max zoom 16 (aux environs de 10m)
-        if (zoom < 16) {
+        //Max zoom = 17 (aux environs de 5m)
+        if (zoom <= 16) {
             //Zoome
             zoom++;
             SharedPreferences.Editor editor = sharedPref.edit();
@@ -481,6 +659,77 @@ public class cartodraw extends View {
             //ReTrace
             invalidate();
         }
+    }
+
+    //Ajoute un wpt au fichier gpx
+    public void WriteMyGPX(String nom) {
+
+        int nb = glob.mygpxList.size();
+        if (nb==0) return;
+
+        Calendar c = Calendar.getInstance();
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        String formatdate = df.format(c.getTime());
+
+        File dir0 = new File(Environment.getExternalStorageDirectory().toString() + "/gpxdata");
+        String path0 = dir0.toString();
+        if (!dir0.exists()) {
+            Toast.makeText(mContext, "No gpxdata directory !", Toast.LENGTH_LONG).show();
+            return;
+        }
+        String path = path0 + "/" + nom;
+        File gpx = new File(path);
+
+        FileWriter fw = null;
+        try {
+            fw = new FileWriter(gpx.getAbsoluteFile(), true);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        BufferedWriter bw = new BufferedWriter(fw);
+
+        try {
+            bw.write("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\" ?>\r\n");
+            bw.write("<gpx xsi:schemaLocation=\"http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/11.xsd\"\r\n");
+            bw.write("xmlns=\"http://www.topografix.com/GPX/1/1\"\r\n");
+            bw.write("xmlns:ns3=\"http://www.garmin.com/xmlschemas/TrackPointExtension/v1\"\r\n");
+            bw.write("xmlns:ns2=\"http://www.garmin.com/xmlschemas/GpxExtensions/v3\"\r\n");
+            bw.write("xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\r\n");
+            bw.write("xmlns:ns1=\"http://www.cluetrust.com/XML/GPXDATA/1/0\"\r\n");
+            bw.write("creator=\"Huami Amazfit Sports Watch\" version=\"1.1\">\r\n");
+            bw.write("<metadata>\r\n");
+            bw.write("<name>Amazfit GPS Tracker</name>\r\n");
+            bw.write("<author>\r\n");
+            bw.write("<name>Samblancat Stratos 3</name>\r\n");
+            bw.write("</author>\r\n");
+            bw.write("<time>"+formatdate+"</time>\r\n");
+            bw.write("</metadata>\r\n");
+            bw.write("<trk>\r\n");
+            bw.write("<name>Track "+formatdate+"</name>\r\n");
+            bw.write("<trkseg>\r\n");
+
+            for (int nn = 0; nn < nb; nn++) {
+                Location loc = glob.mygpxList.get(nn);
+                //Insertion du wpt a la fin
+                bw.write("<trkpt lat=\"" + loc.getLatitude() + "\" lon=\"" + loc.getLongitude() + "\">\r\n");
+                bw.write("<ele>" + loc.getAltitude() + "</ele>\r\n");
+                bw.write("<time>" + loc.getProvider() + "</time>\r\n");
+                bw.write("<name>" + nn + "</name>\r\n");
+                bw.write("</trkpt>\r\n");
+            }
+
+            bw.write("</trkseg>\r\n");
+            bw.write("</trk>\r\n");
+            bw.write("</gpx>\r\n");
+            bw.close();
+            if (fw != null) fw.close();
+        } catch (IOException e) {
+            //You'll need to add proper error handling here
+        }
+
+        //Sync la Media-connection pour visu sur Windows usb
+        MediaScannerConnection.scanFile(mContext,
+                new String[]{gpx.getAbsolutePath()}, null, null);
     }
 
 }

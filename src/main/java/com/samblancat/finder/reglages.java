@@ -1,6 +1,7 @@
 package com.samblancat.finder;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Environment;
@@ -12,26 +13,29 @@ import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.Spinner;
 import android.widget.Toast;
-
 import java.io.File;
 
 public class reglages extends AppCompatActivity {
     Context mContext;
     SharedPreferences sharedPref;
-    public String gpxini;
     public CheckBox compchk, autowptchk, sortbydist;
-    int ok=0;
+    public int ok=0, firstbuiltshow=0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+         int pt, i, deja=0;
 
         setContentView(R.layout.reglage);
         mContext = this;
 
         //Reprend le Gpx de base
         sharedPref = getBaseContext().getSharedPreferences("POSPREFS", MODE_PRIVATE);
-        gpxini = sharedPref.getString("gpxini","gpxlocator.gpx");
+        try { glob.gpxini = sharedPref.getString("gpxini","gpxlocator.gpx"); }
+        catch (Exception e) {
+            e.printStackTrace();
+            glob.gpxini="<no file>";
+         }
 
         compchk = (CheckBox) findViewById(R.id.setcompasschk);
         autowptchk = (CheckBox) findViewById(R.id.autonextchk);
@@ -87,46 +91,58 @@ public class reglages extends AppCompatActivity {
         });
 
         //Fait la liste des gpx
-        //Test si gpxdata existe
         File dir0 = new File(Environment.getExternalStorageDirectory().toString()+"/gpxdata");
-        String path0 = dir0.toString();
         if ( !dir0.exists() ) {
             Toast.makeText(mContext, "No 'gpxdata' directory !", Toast.LENGTH_LONG).show();
             return;
         }
 
         File[] filelist = dir0.listFiles();
-      //  Log.d("Fsiz= ", Integer.toString(filelist.length));
-        //Met en premier la valeur du gpx initial
-        String[] thefiles = new String[filelist.length];
-        thefiles[0] = gpxini;
+        //Met en premier la valeur du gpx initial (ajoute 1 pour '<no file>'
+        String[] thefiles = new String[1 + filelist.length];
+        //commence par le file en cours (si il existe !)
+        File f_ini = new File(Environment.getExternalStorageDirectory().toString()+"/gpxdata/"+glob.gpxini);
+        if (!f_ini.exists()) glob.gpxini="<no file>";
+        thefiles[0] = glob.gpxini;
+
+        //si y avait rien -> pas la peine de '<no file>' a la fin de liste
+        if (glob.gpxini.equals("<no file>")) deja = 1;
+
         //ecrit en décalé !  sur un array de long
-        for (int i = 0, pt=1; i < thefiles.length; i++) {
-            //ne met pas deux fois le gpxini
-          //  Log.d("Fil= ", filelist[i].getName()+" i="+Integer.toString(i));
-            if (!gpxini.equals(filelist[i].getName())) {
+        for (i = 0, pt = 1; i < filelist.length; i++) {
+            //ne met pas deux fois le gpxini & ne copie pas le '<no file>'
+            if (!glob.gpxini.equals(filelist[i].getName())) {
                 //!!! Sécurité anti-crash si gpxini est FAUX !!!
-                if (pt>=filelist.length) pt=0;
+                if (pt >= 1+filelist.length) pt=0;
                 thefiles[pt] = filelist[i].getName();
-           //     Log.d("Fil= ", filelist[i].getName()+" pt="+Integer.toString(i));
                 pt++;
             }
         }
-        ArrayAdapter adapter = new ArrayAdapter<String>(mContext, android.R.layout.simple_dropdown_item_1line, thefiles);
-        final Spinner spin = (Spinner) findViewById(R.id.gpxlist);
+        //Ajoute 'pas de fichier'
+        if (deja==0) thefiles[pt] ="<no file>";
+
+        ArrayAdapter adapter = new ArrayAdapter<String>(mContext, android.R.layout.simple_spinner_dropdown_item, thefiles);    // simple_dropdown_item_1line
+        final Spinner spin = findViewById(R.id.gpxlist);
         spin.setAdapter(adapter);
 
         spin.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                Object o=spin.getSelectedItem();
-                //Sauve le GPX ini !
-                SharedPreferences.Editor editor = sharedPref.edit();
-                editor.putString("gpxini", o.toString());
-                editor.putFloat("zoom", (float) 0);
-                editor.putFloat("shx", (float) 0);
-                editor.putFloat("shy", (float) 0);
-                editor.apply();
+                if (firstbuiltshow!=0) {
+                    Object o = spin.getSelectedItem();
+                    //Sauve le GPX ini !
+                    SharedPreferences.Editor editor = sharedPref.edit();
+                    glob.gpxini = o.toString();
+                    editor.putString("gpxini", glob.gpxini);
+                    editor.apply();
+                    //Aff les stats de track
+                    if (!glob.gpxini.equals("<no file>")) {
+                        Intent intent = new Intent(mContext, statsgpx.class);
+                        mContext.startActivity(intent);
+                    }
+                }
+                //set flag pour eviter adffich au Create()
+                firstbuiltshow=1;
             }
             @Override
             public void onNothingSelected(AdapterView<?> parentView) {

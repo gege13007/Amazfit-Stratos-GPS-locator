@@ -45,7 +45,7 @@ public class Scan extends AppCompatActivity implements SensorEventListener {
     SharedPreferences sharedPref;
     double mylat=0, mylng=0, alt=0;
     double mylat0=0, mylng0=0;
-    String wptname, gpxini;
+    String wptname;
     double cap, cap0, compas=0;
     //Flag si compas bouge
     int compasok=0;
@@ -66,7 +66,7 @@ public class Scan extends AppCompatActivity implements SensorEventListener {
         sharedPref = getBaseContext().getSharedPreferences("POSPREFS", MODE_PRIVATE);
         compasok = sharedPref.getInt("compas", 0);
         autonext = sharedPref.getInt("autonext", 0);
-        gpxini = sharedPref.getString("gpxini","gpxlocator.gpx");
+        glob.gpxini = sharedPref.getString("gpxini","gpxlocator.gpx");
 
         //Retrouve Position de Destination
         mylat0 = sharedPref.getFloat("lat0", (float) mylat);
@@ -107,15 +107,15 @@ public class Scan extends AppCompatActivity implements SensorEventListener {
                 String formatdate = df.format(c.getTime());
                 //prend mylat/lng qui sont filtrés du 0.0
                 if ((mylat!=0)&&(mylng!=0)) {
-                    appendGPX(mylat, mylng, alt, formatdate);
+                    glob.appendGPX(mContext, mylat, mylng, alt, formatdate);
                     String togo = new DecimalFormat("#0.0000").format(mylat);
                     togo += "/" + new DecimalFormat("#0.0000").format(mylng);
-                    Toast.makeText(mContext, "Position "+togo+" saved to " + gpxini, Toast.LENGTH_LONG).show();
+                    Toast.makeText(mContext, "Position "+togo+" saved to " + glob.gpxini, Toast.LENGTH_LONG).show();
                 }
                 return true;
             }
         });
-        Toast.makeText(getApplicationContext(), "  Long Click to create  save a new Waypoint !", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(), "Long Click to create a Waypoint !", Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -168,65 +168,6 @@ public class Scan extends AppCompatActivity implements SensorEventListener {
     }
 
 
-    public void appendGPX(Double la, Double lo, Double ele, String nom){
-        File dir0 = new File(Environment.getExternalStorageDirectory().toString()+"/gpxdata");
-        String path0 = dir0.toString();
-        if ( !dir0.exists() ) {
-            Toast.makeText(mContext, "No 'gpxdata' directory !", Toast.LENGTH_LONG).show();
-            return;
-        }
-        String path = path0 + "/" + sharedPref.getString("gpxini","gpxlocator.gpx");
-
-        File gpx = new File(path);
-        String path2 = path0 + "/gpslocator.tmp";
-        File gpx2 = new File(path2);
-
-        FileWriter fw = null;
-        try {
-            fw = new FileWriter(gpx2.getAbsoluteFile(), true);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        BufferedWriter bw = new BufferedWriter(fw);
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(gpx));
-            String line;
-            while ((line = br.readLine()) != null) {
-                if (line.length()>8) {
-                    if (line.substring(0, 8).equals("</trkseg")) {
-                        //Insertion du wpt a la fin
-                        bw.write("<trkpt lat=\""+la.toString()+"\" lon=\""+lo.toString()+"\">\r\n");
-                        bw.write("<ele>"+ele.toString()+"</ele>\r\n");
-                        Calendar c = Calendar.getInstance();
-                        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-                        String formatdate = df.format(c.getTime());
-                        df = new SimpleDateFormat("HH:mm:ss");
-                        formatdate = formatdate+"T"+df.format(c.getTime());
-                        bw.write("<time>"+formatdate+"Z</time>\r\n");
-                        bw.write("<name>"+nom+"</name>\r\n");
-                        bw.write("</trkpt>\r\n");
-                    }
-                }
-                bw.write(line+"\r\n");
-            }
-            br.close();
-            bw.close();
-            if (fw != null) fw.close();
-        } catch (IOException e) {
-            //You'll need to add proper error handling here
-        }
-        //efface le source
-        boolean b =gpx.delete();
-        //renomme le tmp en Gps
-        b = gpx2.renameTo(gpx);
-        if (gpx2.exists()) b=gpx2.delete();
-
-        //Sync la Media-connection pour visu sur Windows usb
-        MediaScannerConnection.scanFile(mContext,
-                new String[]{gpx.getAbsolutePath()}, null, null);
-    }
-
-
     public Location getNextWpt(Double lat, Double lng) {
         int tri;
         // Extrait la liste Array des 'name'
@@ -257,7 +198,7 @@ public class Scan extends AppCompatActivity implements SensorEventListener {
         public static final String ACTION_RESP ="com.samblancat";
         @Override
         public void onReceive(Context context, Intent intent) {
-            String tp, la, lo, fix;
+            String la, lo, fix;
             AlertDialog.Builder builder;
             int satok;
             double al;
@@ -309,7 +250,7 @@ public class Scan extends AppCompatActivity implements SensorEventListener {
                 //Calc distance à mylat0/lng0
                 double dk = Math.pow(Math.abs(mylat - mylat0), 2);
                 dk += Math.pow(Math.cos(Math.toRadians(mylat))*Math.abs(mylng - mylng0), 2);
-                dk = 1000 * 111.12 * Math.sqrt(dk);
+                dk = 1000 * 60 * 1.852 * Math.sqrt(dk);
                 //--------- Test état de l'approche ---------
                 //Si On s'éloigne ?
                 if ((arrived == 2) && (dk > 25)) {
@@ -407,22 +348,8 @@ public class Scan extends AppCompatActivity implements SensorEventListener {
                     arrived = 1;
                     counter=0;
                 }
-                //test si en km?
-                if (dk < 1000) {
-                    tp = new DecimalFormat("###0").format(dk);
-                    dtxt.setText(tp + "m");
-                } else {
-                    // en km
-                    dk = dk / 1000;
-                    if (dk < 10) tp = new DecimalFormat("0.00").format(dk);
-                    else {
-                        if (dk < 100)
-                            tp = new DecimalFormat("#0.0").format(dk);
-                        else
-                            tp = new DecimalFormat("###0").format(dk);
-                    }
-                    dtxt.setText(tp + "km");
-                }
+                //Affiche dist en m ou km?
+                dtxt.setText(glob.dtotext(dk));
 
                 //Calcul du cap
                 cap = 0;

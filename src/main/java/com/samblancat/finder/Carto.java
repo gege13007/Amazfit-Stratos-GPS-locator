@@ -4,24 +4,26 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.widget.Toast;
 
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class Carto extends AppCompatActivity {
     Context mContext;
     private cartodraw cartoview;
-    public float x1,x2,y1,y2;
+    public float x1, x2, y1, y2;
     private BroadcastReceiver receiver;
-    SharedPreferences sharedPref;
     public static final String BROADCAST_ACTION = "com.samblancat";
     public int counterpos=0;
     public double wx , wy, cx, cy;
     public double dlat=0, dlon=0;
     public long touchtime = 0;
+    public Timer mytime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +36,30 @@ public class Carto extends AppCompatActivity {
         cx = wx/2;
         cy = wy/2;
 
-        sharedPref = getBaseContext().getSharedPreferences("POSPREFS", MODE_PRIVATE);
+        //Mode de vue map - map+incrust - sortie
+        glob.modevue = 0;
+
+        //Lance timer toutes les 6 secondes pour calc vitesse
+        mytime = new Timer();
+        TimerTask timerTaskObj = new TimerTask() {
+            public void run() {
+                if (glob.oldlat!=0) {
+                    //Calc distance à oldlat/oldlon
+                    double x = Math.pow(Math.abs(glob.lastlat - glob.oldlat), 2);
+                    x += Math.pow(Math.cos(Math.toRadians(glob.lastlat)) * Math.abs(glob.lastlon - glob.oldlon), 2);
+                    x = Math.sqrt(x);
+                    //distance des deux points en 5 sec
+                    x = 111120 * x;
+                    //Vitesse instant (moyenne pondérée / 3)
+                    glob.realspeed += (1.2 * x);    // 2 * ( 3.600 / 6 )
+                    glob.realspeed /= 3;
+                }
+                //sauve last posit
+                glob.oldlat=glob.lastlat;
+                glob.oldlon=glob.lastlon;
+            }
+        };
+        mytime.schedule(timerTaskObj, 0, 6000);
 
         cartoview = new cartodraw(this);
         setContentView(cartoview);
@@ -62,12 +87,14 @@ public class Carto extends AppCompatActivity {
                 y2 = ev.getY();
                 //Test si long click ?
                 touchtime = (System.currentTimeMillis()-touchtime);
-                if ( (touchtime>2000) && (Math.abs(x2 - x1)<1) && (Math.abs(y2 - y1)<1) ) {
+                if ( (touchtime>1500) && (Math.abs(x2 - x1) < 4) && (Math.abs(y2 - y1) < 4) ) {
+                    // Lance choix multiple !
                     cartoview.StoreNewWpt(x2, y2);
                 }
                 else {
-                    //Traitement des boutons zoom...
-                    if ((Math.abs(x2 - x1)<1) && (Math.abs(y2 - y1)<1)) {
+                    //Traitement du Tap Rapide (zoom...ou changement de vue ?)
+            //        Log.d("TAP", Integer.toString((int) (Math.abs(x2 - x1)+Math.abs(y2 - y1))));
+                    if ((Math.abs(x2 - x1)<2) && (Math.abs(y2 - y1)<2)) {
                         //Test si ZOOM ?
                         if (y2 > wy - 65) {
                             if (x2 > cx + 30) {
@@ -78,10 +105,18 @@ public class Carto extends AppCompatActivity {
                                 } else
                                     cartoview.centermap();
                             }
-                        } else
-                            //Click ailleurs -> sort !
-                            finish();
+                        } else {
+                            // Changement de vue -> sort ?
+                            glob.modevue++;
+                            glob.modevue=(glob.modevue % 3);
+                            //si datas incrustation
+                            if (glob.modevue==1) cartoview.updateData(dlat, dlon);
+                            //si sortie
+                            if (glob.modevue==2) finish();
+                        }
                     }
+                    //anti-rebond ?
+                    x2=0; y2=0;
                 }
                 break;
             case MotionEvent.ACTION_MOVE:
@@ -89,11 +124,10 @@ public class Carto extends AppCompatActivity {
                 y2 = ev.getY();
 
                 //SHIFT de l'écran
-                //    Log.d("sh ", String.valueOf(x2-x1)+" "+String.valueOf(y2-y1));
                 if (Math.abs(x2 - x1) + Math.abs(y2 - y1) > 15) {
-                    cartoview.shift(x2 - x1, y2 - y1);
-                    x1 = x2-3;  // pour test anti-rebond ?
-                    y1 = y2-3;
+                    cartoview.shift((x2 - x1)/3, (y2 - y1)/3);
+             //       x1 = x2-3;  // pour test anti-rebond ?
+             //       y1 = y2-3;
                 }
                 break;
         }
@@ -112,7 +146,7 @@ public class Carto extends AppCompatActivity {
     protected void onUserLeaveHint() {
         super.onUserLeaveHint();
     //    if (nepasfermer<1) {
-            Log.d("TAG", "Activity Minimized");
+    //        Log.d("TAG", "Activity Minimized");
     //        finish();
     //    }
     }
@@ -128,10 +162,12 @@ public class Carto extends AppCompatActivity {
     protected void onDestroy() {
         // TODO Auto-generated method stub
         super.onDestroy();
+
+        mytime.cancel();
+
         try { unregisterReceiver(receiver );
         } catch(IllegalArgumentException e) { e.printStackTrace(); }
     }
-
 
     //Attention ! Les données arrive ici par paquets : un coup du gsv,
     //un coup du Lat/lon... il peut donc y avoir du null...

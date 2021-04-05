@@ -15,8 +15,9 @@ import android.os.IBinder;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.widget.Toast;
-
-import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 
 // Crée un service en tache de fond pour le Location Listener & ne pas arrêter les Updates ...
 public class LocService extends Service {
@@ -65,6 +66,10 @@ public class LocService extends Service {
     public class MyLocationListener implements LocationListener {
 
         public void onLocationChanged(final Location loc) {
+            Calendar c = Calendar.getInstance();
+            SimpleDateFormat fdate = new SimpleDateFormat("yy-MM-dd");
+            SimpleDateFormat ftime = new SimpleDateFormat("HH:mm:ss");
+
             Intent broadCastIntent = new Intent();
             broadCastIntent.setAction("com.samblancat");
             lat = loc.getLatitude();
@@ -79,11 +84,38 @@ public class LocService extends Service {
             editor.putFloat("dlat", (float) lat);
             editor.putFloat("dlng", (float) lon);
             editor.apply();
+
+            //Test si new point si Tracking en cours !
+            if (glob.tracking) {
+                //Fait à peu près 5m d'écart
+                double x = 10000 * (Math.abs(lat-glob.lastlat)+Math.abs(lon-glob.lastlon));
+                if (x > 1) {
+                    //test si calc segment de distance
+                    x = Math.pow(Math.abs(glob.lastlat - lat), 2);
+                    x += Math.pow(Math.cos(Math.toRadians(lat)) * Math.abs(glob.lastlon - lon), 2);
+                    //distance des deux points en m
+                    x = 111120 * Math.sqrt(x);
+                    //Distance cumulée track
+                    glob.realdist += x;
+
+                    String locname = Integer.toString(glob.nbtracking++);
+                    Location newpt = new Location(locname);
+                    newpt.setLatitude(lat);
+                    newpt.setLongitude(lon);
+                    newpt.setAltitude(loc.getAltitude());
+                    //stocke date+heure dans le 'Provider'
+                    newpt.setProvider(fdate.format(c.getTime())+"T"+ftime.format(c.getTime())+"Z");
+                    glob.mygpxList.add(newpt);
+                }
+            }
+
+            glob.lastlat=lat;
+            glob.lastlon=lon;
+            glob.lastalt=loc.getAltitude();
         }
 
         @Override
         public void onStatusChanged(String provider, int status, Bundle extras) {
-
         }
 
         public void onProviderDisabled(String provider) {
@@ -121,6 +153,7 @@ public class LocService extends Service {
                 //Extrait Fix (0=no 1=ok 2=dgps)
                 String txt=nmeaSplit[6];
                 broadCastIntent.putExtra("Fix", txt);
+                if (txt.equals("0")) glob.gpsfix=0; else glob.gpsfix=1;
 
                 //Extrait HDOP
                 txt=nmeaSplit[8];

@@ -21,7 +21,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -30,7 +29,9 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -43,7 +44,6 @@ public class Selectpos extends AppCompatActivity  {
     static double mylng0=0;
     static Integer nbWpts=0;
     SharedPreferences sharedPref;
-    public static String gpxini;
     String wptname;
     int tri;
 
@@ -57,7 +57,7 @@ public class Selectpos extends AppCompatActivity  {
 
         //Reprend le Gpx de base
         sharedPref = getBaseContext().getSharedPreferences("POSPREFS", MODE_PRIVATE);
-        gpxini = sharedPref.getString("gpxini","gpxlocator.gpx");
+        glob.gpxini = sharedPref.getString("gpxini","gpxlocator.gpx");
         tri = sharedPref.getInt("sortbydist", 1);
 
         //Retrouve last Position courante pour tri / distances
@@ -71,7 +71,7 @@ public class Selectpos extends AppCompatActivity  {
             Toast.makeText(mContext, "No 'gpxdata' directory !", Toast.LENGTH_LONG).show();
             return;
         }
-        String path = path0 +"/" + gpxini;
+        String path = path0 +"/" + glob.gpxini;
       //  Log.d("GPXpath :", path);
 
         final File gpxFile = new File(path);
@@ -216,7 +216,7 @@ public class Selectpos extends AppCompatActivity  {
 
     public void DeleteGpx() {
         String path0 = Environment.getExternalStorageDirectory().toString()+"/gpxdata";
-        String path = path0 + "/" + gpxini;
+        String path = path0 + "/" + glob.gpxini;
         File gpx = new File(path);
         gpx.delete();
         Log.d("GPX :", "delete ok");
@@ -224,7 +224,7 @@ public class Selectpos extends AppCompatActivity  {
 
     public void LireGpx() {
         String path0 = Environment.getExternalStorageDirectory().toString()+"/gpxdata";
-        String path = path0 + "/" + gpxini;
+        String path = path0 + "/" + glob.gpxini;
         File gpx = new File(path);
    //     Log.d("Rd :", "Read "+gpx.toString());
         try {
@@ -240,13 +240,15 @@ public class Selectpos extends AppCompatActivity  {
     }
 
     public void DeleteWptGPX(String nom){
+        String noname;
         String path0 = Environment.getExternalStorageDirectory().toString()+"/gpxdata";
-        String path = path0 + "/" + gpxini;
+        String path = path0 + "/" + glob.gpxini;
         File gpx = new File(path);
         String path2 = path0 + "/gpslocator.tmp";
         File gpx2 = new File(path2);
 
         String nametofind = "<name>"+nom+"</name>";
+        Log.d("del ", "<name>"+nom+"</name>");
 
         FileWriter fw = null;
         try { fw = new FileWriter(gpx2.getAbsoluteFile(), true); }
@@ -264,33 +266,55 @@ public class Selectpos extends AppCompatActivity  {
                 //Teste si début d'un nouveau WPT
                 //(envoie par defaut les '<trk>' plus petit que le '<trkpt' qui iest testé après
                 if (line.length()<=5) {
-                    Log.d("del ", line);
+            //        Log.d("del ", line);
                     //envoie vers le fichier tmp
                     bw.write(line + "\r\n");
                 }
                 //Teste si début d'un nouveau WPT
                 if (line.length()>5)  if (line.substring(0, 6).equals("<trkpt")) {
+                    //ReFait un wptname par défaut (au cas ou pas de name reel dans gpx)
+                    String coords[] = line.split(" ");
+                    String non=coords[1];
+                    non=non.replace("\"", "");
+                    non=non.replace("lat=", "");
+                    if (non.length()>6) non= non.substring(0,7);
+                    noname=non+"/";
+                    non=coords[2];
+                    non=non.replace("\"", "");
+                    non=non.replace("lon=", "");
+                    if (non.length()>6) non= non.substring(0,7);
+                    noname +=non;
+
                     //Stocke le wpt en tampon jusqu'au 'name'
                     ArrayList<String> lines = new ArrayList<String>();
                     while ( true ) {
-                        //sauve une ligne
+                        //sauve une ligne dans le fichier tampon
                         lines.add(line);
                         //Test si on rentre dans le Waypoint à supprimer (name = wptname ?)
-                        if (line.length()>5) if (line.substring(0,6).equals("<name>")) {
-                            if (line.equals(nametofind)) {
-                                todelete=true;
+                        if (line.length()>5) {
+                            if (line.substring(0, 6).equals("<name>")) {
+                                if (line.equals(nametofind)) {
+                                    todelete = true;
+                                    Log.d("del ", "par <name>");
+                                }
+                            } else {
+                                //compare au nom brut (sans les <name>...</name>)
+                                if (noname.equals(nom)) {
+                                    todelete = true;
+                                    Log.d("del ", "par noname");
+                                }
                             }
                         }
 
                         //Teste la fin du Wpt ?
-                        if (line.length()>6) if (line.substring(0, 7).equals("</trkpt")) break;
+                        if (line.contains("</trkpt")) break;
 
                         if ((line = br.readLine()) == null) break;
                     }
                     //Renvoie (si pas deleté) le wpt en memoire tampon
                     if (!todelete) {
                         for (int nl = 0; nl < lines.size(); nl++) {
-                            Log.d("del ", lines.get(nl));
+                       //     Log.d("del ", lines.get(nl));
                             //envoie le NON supprimé vers le fichier tmp
                             bw.write(lines.get(nl)+"\r\n");
                         }
@@ -298,7 +322,7 @@ public class Selectpos extends AppCompatActivity  {
                 }
                 else {
                     //Pas dans un WPT <trkpt>
-                    Log.d("del ", line);
+                //    Log.d("del ", line);
                     //envoie le NON supprimé vers le fichier tmp
                     bw.write(line+"\r\n");
                 }
@@ -328,6 +352,7 @@ public class Selectpos extends AppCompatActivity  {
         //Liste des positions
         List<Location> list = new ArrayList<>();
         DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+
         try {
             DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
             FileInputStream fileInputStream = new FileInputStream(file);
@@ -336,8 +361,10 @@ public class Selectpos extends AppCompatActivity  {
             //Liste des blocs 'trkpt'
             NodeList nodelist_trkpt = elementRoot.getElementsByTagName("trkpt");
             nbWpts = nodelist_trkpt.getLength();
+            Log.d("dcod: ", "nbpt ="+nbWpts);
             for(int i = 0; i < nbWpts; i++){
                 String wptname="";
+                String wpttime="";
                 double newAlt_double=0;
                 Node node = nodelist_trkpt.item(i);
                 NamedNodeMap attributes = node.getAttributes();
@@ -345,7 +372,6 @@ public class Selectpos extends AppCompatActivity  {
                 double newLat_double = Double.parseDouble(newLat);
                 String newLon = attributes.getNamedItem("lon").getTextContent();
                 double newLon_double = Double.parseDouble(newLon);
-            //    Log.d("dcod: ", newLat+" / "+newLon);
 
                 //Calc pseudo distance à lat0/lng0
                 Double dist1=Math.pow(Math.abs(lat0-newLat_double),2);
@@ -356,6 +382,8 @@ public class Selectpos extends AppCompatActivity  {
                 NodeList nList = node.getChildNodes();
                 for(int j=0; j<nList.getLength(); j++) {
                     Node el = nList.item(j);
+                    //capte le 'time'
+                    if(el.getNodeName().equals("time"))  wpttime = el.getTextContent();
                     //capte le 'name'
                     if(el.getNodeName().equals("name"))  wptname = el.getTextContent();
                     //capte 'ele' altitude
@@ -374,13 +402,15 @@ public class Selectpos extends AppCompatActivity  {
                 newLocation.setLatitude(newLat_double);
                 newLocation.setLongitude(newLon_double);
                 newLocation.setAltitude(newAlt_double);
+                //sauve le timestamp
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+                Date date = dateFormat.parse(wpttime);
+                newLocation.setTime(date.getTime());
                 //Sauve la distance en 'Accuracy'
                 newLocation.setAccuracy(distance);
                 list.add(newLocation);
             }
             fileInputStream.close();
-        } catch (ParserConfigurationException | FileNotFoundException e) {
-            e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
         }
