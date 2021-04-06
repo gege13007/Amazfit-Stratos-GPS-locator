@@ -112,6 +112,8 @@ Change log
 
 15/06/2020 v4.6.4 - Modif 2 display on Suunto / bug fix on delete waypoint 
 
+4/04/2021 v5.0 - Add speed & distance and direct track saving on the Maps.
+
 
 
 
