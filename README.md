@@ -1,7 +1,11 @@
 # Android Wear GPS OpenStreet Maps & GPX reader
-Simple &amp; effective GPS locator app for Amazfit Xiaomi android wear
-------------------------------------------------------------------------------
-Here is the last version of GPS Maps & compass Locator for Wear Android (tested on Xiaomi Amazfit Stratos 2, Stratos 3, PACE, and SUUNTO...). My first idea was to make a simple position reminder with a compass display, or a Golf Gps watch. We have now a Gpx file viewer with Open Street Maps, that's fine.
+Simple &amp; effective GPS locator app for android wear
+--------------------------------------------------------
+Here is the last version 9.5 (december 2021) of GPS Maps & compass Locator for Wear Android (tested on Xiaomi Amazfit Stratos 2, Stratos 3, PACE, and SUUNTO...).
+I made some changes with the GPX (big) files loading process. 
+An large gpx file listing all water points in France is given for example (Water.gpx).
+
+My first idea was to make a simple position reminder with a compass display, or a Golf Gps watch. We have now a Gpx file viewer with Open Street Maps, that's fine.
 
 This app includes 4 main windows :
 
@@ -113,6 +117,9 @@ Change log
 15/06/2020 v4.6.4 - Modif 2 display on Suunto / bug fix on delete waypoint 
 
 4/04/2021 v5.0 - Add speed & distance and direct track saving on the Maps.
+
+12/2021 - Big changes on gpx read - only on start app, and changing gpx.
+         Read the wpt xml or the trkseg for tracks....
 
 
 
