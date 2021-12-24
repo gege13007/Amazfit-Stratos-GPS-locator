@@ -82,13 +82,8 @@ The first screen uses a 'nmealistener' to get & display a snapshot of the $GPGSV
 The location service and its broadcats is only stopped, when the app is destroyed (if not - your battery don't last so long)...
 We use the 'magnetic orientation sensor type3' to rotate the compass graduations and map, with a sensorManager.registerListener.
 
-For the Maps, I NEVER get to make it work the OSMdroid library ! NEVER ! So I made my own implementation of the tiles selection formula.
-Each OSM tile is a 256x256 png bitmap displayed with usual canvas drawing functions.
+I made my own implementation of the tiles selection formula. Each OSM tile is a 256x256 png bitmap displayed with usual canvas drawing functions.
 Each tile is resized on a 512x512 pixels bitmap, to get more visibility on small screens.
-
-IMPORTANT NOTE !
----------------
-Beware of the electric power drawned by the GPS & Magnetic Sensor. There is no problem if you quitt the App by the 'MAIN MENU' - the task & gps will be off. But don't forget to really close the app, if you are in an other view, and quitt the app with a wear button... 
 
 Change log
 ----------
@@ -119,7 +114,7 @@ Change log
 4/04/2021 v5.0 - Add speed & distance and direct track saving on the Maps.
 
 12/2021 - Big changes on gpx read - only on start app, and changing gpx.
-         Read the wpt xml or the trkseg for tracks....
+         Read the wpt xml or the trkseg for tracks...
 
 
 
