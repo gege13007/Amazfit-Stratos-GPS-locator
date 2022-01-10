@@ -5,7 +5,7 @@
     android:scrollbarStyle="insideInset"
     android:scrollbars="vertical">
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <LinearLayout
         android:id="@+id/regler"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -23,13 +23,21 @@
             android:textStyle="bold" />
 
         <TextView
+            android:id="@+id/nbpoints"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="5sp"
+            android:text="n points"
+            android:textSize="16sp" />
+
+        <TextView
             android:id="@+id/datetxt"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="5sp"
             android:text="Date"
-            android:textAlignment="center"
             android:textSize="16sp" />
 
         <TextView
@@ -38,8 +46,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="5sp"
-            android:text="Len "
-            android:textAlignment="center"
+            android:text=" "
             android:textSize="16sp" />
 
         <TextView
@@ -53,24 +60,12 @@
             android:textSize="16sp" />
 
         <TextView
-            android:id="@+id/altmaxtxt"
+            android:id="@+id/altit"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="5sp"
-            android:gravity="center"
-            android:text="Alt Max"
-            android:textAlignment="gravity"
-            android:textSize="16sp" />
-
-        <TextView
-            android:id="@+id/altmintxt"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="5sp"
-            android:text="Alt Min"
-            android:textAlignment="gravity"
+            android:text="Altitude"
             android:textSize="16sp" />
 
         <TextView
@@ -80,7 +75,6 @@
             android:layout_gravity="center"
             android:layout_marginTop="5sp"
             android:text="Vmoy"
-            android:textAlignment="gravity"
             android:textSize="16sp" />
 
         <ImageButton

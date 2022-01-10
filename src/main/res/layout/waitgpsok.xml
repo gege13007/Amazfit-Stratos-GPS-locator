@@ -25,6 +25,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:alpha="0.5"
+                android:backgroundTint="#1C2B80"
                 android:src="@drawable/radar_beam"
                 android:visibility="visible" />
 
@@ -32,39 +33,39 @@
                 android:id="@+id/progBarText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentTop="true"
                 android:layout_centerHorizontal="true"
-                android:layout_marginTop="75dp"
-                android:text="GPS TRACKER"
-                android:textColor="#FFEB40"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:typeface="normal" />
-
-            <TextView
-                android:id="@+id/versText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/progBarText"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="10dp"
-                android:text="v 3.1"
+                android:layout_marginTop="70dp"
+                android:background="#AA152780"
+                android:text="STRATOS Gps 9.5"
                 android:textColor="#FFEB40"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:typeface="normal" />
 
             <TextView
-                android:id="@+id/gsvtxt"
+                android:id="@+id/progtxt"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/progBarText"
-                android:layout_alignParentStart="false"
                 android:layout_centerHorizontal="true"
-                android:textAlignment="center"
-                android:gravity="center"
+                android:layout_marginTop="8dp"
+                android:background="#AA15278A"
+                android:text="loading"
                 android:textColor="#FFEB40"
-                android:textSize="16sp" />
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/gpxnametxt"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/progtxt"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="8dp"
+                android:background="#AA15278A"
+                android:gravity="center"
+                android:text="camps.gpx"
+                android:textColor="#FFEB40"
+                android:textSize="18sp" />
         </RelativeLayout>
     </LinearLayout>
 </ScrollView>

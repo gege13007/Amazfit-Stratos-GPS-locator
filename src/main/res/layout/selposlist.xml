@@ -19,9 +19,9 @@
         style="@android:style/Widget.Holo.Light.ListView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center|center_horizontal"
-        android:layout_marginLeft="20sp"
-        android:layout_marginRight="20sp"
+        android:layout_gravity="center"
+        android:layout_marginLeft="18sp"
+        android:layout_marginRight="18sp"
         android:background="@drawable/list_shape"
         android:clickable="true"
         android:divider="@android:color/holo_green_light"
@@ -29,7 +29,7 @@
         android:focusable="true"
         android:keepScreenOn="true"
         android:longClickable="true"
-        android:scrollbarSize="8dp"
-        android:scrollbarStyle="outsideInset"
-        android:textAlignment="center" />
+        android:scrollbarSize="20dp"
+        android:scrollbarStyle="insideOverlay"
+        android:scrollbars="vertical" />
 </LinearLayout>

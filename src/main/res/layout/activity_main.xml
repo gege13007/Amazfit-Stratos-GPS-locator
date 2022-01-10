@@ -17,6 +17,7 @@
         android:orientation="vertical"
         android:textAlignment="center">
 
+
         <TextView
             android:id="@+id/title"
             android:layout_width="match_parent"
@@ -31,7 +32,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="@string/waitgps"
+            android:text= "@string/waitgps"
             android:textSize="13sp" />
 
         <TextView
@@ -84,8 +85,8 @@
                 android:background="@drawable/finder32red"
                 android:onClick="setposcmd" />
         </LinearLayout>
-    </LinearLayout>
 
+    </LinearLayout>
 
 </ScrollView>
 
