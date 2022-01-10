@@ -6,6 +6,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -19,15 +21,26 @@ import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import java.io.File;
+import java.io.FileInputStream;
 import java.text.DecimalFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.ArrayList;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 public class MainActivity extends AppCompatActivity {
     private BroadcastReceiver receiver;
     public static final String BROADCAST_ACTION = "com.samblancat";
-    Context mContext;
-    public double mylat0=0, mylng0=0;
+    public Context mContext;
     public double mylat=0, mylng=0, alt=0;
     public int satok=0;
     public String wptname;
@@ -45,10 +58,20 @@ public class MainActivity extends AppCompatActivity {
         mContext = this;
 
         sharedPref = getBaseContext().getSharedPreferences("POSPREFS", MODE_PRIVATE);
-        //Retrouve last Position courante destination en cours ?
-        mylat0 = sharedPref.getFloat("lat0", 0);
-        mylng0 = sharedPref.getFloat("lng0", 0);
+
         wptname = sharedPref.getString("nom", "");
+
+        glob.shownames = sharedPref.getInt("shownames", 1);
+
+        String manufacturer = Build.MANUFACTURER;
+        String model = Build.MODEL;
+        int version = Build.VERSION.SDK_INT;
+        String versionRelease = Build.VERSION.RELEASE;
+        Log.e("Versions", "manufacturer " + manufacturer
+                + " \n model " + model
+                + " \n version " + version
+                + " \n versionRelease " + versionRelease
+        );
 
         ImageButton img = findViewById(R.id.gotocmd);
         assert wptname != null;
@@ -83,12 +106,10 @@ public class MainActivity extends AppCompatActivity {
 
         //l'appli peut etre fermée !
         nepasfermer = 0;
-        Log.d("main", "onResume: nepasfermer="+nepasfermer);
 
         sharedPref = getBaseContext().getSharedPreferences("POSPREFS", MODE_PRIVATE);
         wptname = sharedPref.getString("nom", "");
-        mylat0 = sharedPref.getFloat("lat0", 0);
-        mylng0 = sharedPref.getFloat("lng0", 0);
+
         ImageButton img = findViewById(R.id.gotocmd);
         if (!wptname.equals("")) {
             Animation aniRotateClk = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.rotate);
@@ -121,9 +142,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onUserLeaveHint() {
         super.onUserLeaveHint();
- //       Log.d("TAG", "Activity Minimized nepasfermer="+nepasfermer);
+ //       Log.e("TAG", "Activity Minimized nepasfermer="+nepasfermer);
         if (nepasfermer<1) {
-            Log.d("TAG", "Activity Minimized");
+            Log.e("TAG", "Activity Minimized");
             finish();
         }
     }
@@ -132,7 +153,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
- //       Log.d("TAG", "onPause nepasfermer="+nepasfermer);
+ //       Log.e("TAG", "onPause nepasfermer="+nepasfermer);
         if (nepasfermer<1) {
             finish();
         }
@@ -146,9 +167,109 @@ public class MainActivity extends AppCompatActivity {
         unregisterReceiver(receiver);
         //Stoppe le service broadcast !
         stopService(new Intent(getBaseContext(), LocService.class));
- //       Log.d("main", "onDestroy");
         //ASSURE FIN DU PROCESS !!!
         android.os.Process.killProcess(android.os.Process.myPid());
+    }
+
+
+    //Renvoie la Liste des Wpts contenus dans le File gpxini
+    // La distance à (lat0/lng0) est stockée dans .accuracy
+    public static void decodeGPX(File file, Double lat0, Double lng0) {
+
+        //Reset Liste des positions
+        glob.gpxList = new ArrayList<>();
+
+        //raz first point
+        glob.maplat0 = 0;
+
+        DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+        try {
+            DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+            FileInputStream fileInputStream = new FileInputStream(file);
+            Document document = documentBuilder.parse(fileInputStream);
+            Element elementRoot = document.getDocumentElement();
+            //Liste des blocs 'trkpt'
+            NodeList nodelist_trkpt = elementRoot.getElementsByTagName("trkpt");
+            int nbWpts = nodelist_trkpt.getLength();
+            if (nbWpts > 0) {
+                glob.NbPts = nbWpts;
+                glob.NbTrk = 1;
+                Log.e("dcod: ", "nbtrkpt =" + nbWpts);
+            }
+            if (nbWpts<1) {
+                nodelist_trkpt = elementRoot.getElementsByTagName("wpt");
+                nbWpts = nodelist_trkpt.getLength();
+                Log.e("dcod: ", "nbWpt =" + nbWpts);
+                glob.NbPts = nbWpts;
+                glob.NbTrk = 0;
+            }
+
+            for(int i = 0; i < nbWpts; i++ ){
+                String wptname="";
+                String wpttime="";
+                double newAlt_double=0;
+                Node node = nodelist_trkpt.item(i);
+                NamedNodeMap attributes = node.getAttributes();
+                String newLat = attributes.getNamedItem("lat").getTextContent();
+                double newLat_double = Double.parseDouble(newLat);
+                String newLon = attributes.getNamedItem("lon").getTextContent();
+                double newLon_double = Double.parseDouble(newLon);
+
+                //sauve le premier point du gpx
+                if (glob.maplat0==0) {
+                    glob.maplat0=newLat_double;
+                    glob.maplon0=newLon_double;
+                }
+                //Calc pseudo distance à lat0/lng0
+                Double dist1=Math.pow(Math.abs(lat0-newLat_double),2);
+                Double dist2=Math.pow(Math.abs(lng0-newLon_double),2);
+                float distance = (float) Math.sqrt(dist1 + dist2);
+
+                //strip les champs inclus au trkpt
+                NodeList nList = node.getChildNodes();
+                for(int j=0; j<nList.getLength(); j++) {
+                    Node el = nList.item(j);
+                    //capte le 'time'
+                    if(el.getNodeName().equals("time"))  wpttime = el.getTextContent();
+                    //capte le 'name'
+                    if(el.getNodeName().equals("name"))  wptname = el.getTextContent();
+                    //capte 'ele' altitude
+                    if(el.getNodeName().equals("ele")) {
+                        String newAlt = el.getTextContent();
+                        newAlt_double = Double.parseDouble(newAlt);
+                    }
+                }
+                //Si Pas de nom -> affiche extrait de la position
+                if ( wptname.equals("") ) {
+                    if (newLat.length()>6) wptname= newLat.substring(0,7); else wptname= newLat;
+                    if (newLon.length()>6) wptname+= "/"+newLon.substring(0,7); else wptname+= "/"+ newLon;
+                }
+                //stoc la Location dans la 'list'
+                Location newLocation = new Location(wptname);
+                newLocation.setLatitude(newLat_double);
+                newLocation.setLongitude(newLon_double);
+                newLocation.setAltitude(newAlt_double);
+                //sauve le timestamp
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+                try {
+                    Date date = dateFormat.parse(wpttime);
+                    newLocation.setTime(date.getTime());
+                } catch (ParseException ignored) {
+
+                }
+
+                //Sauve la distance en 'Accuracy'
+                newLocation.setAccuracy(distance);
+
+                glob.gpxList.add(newLocation);
+
+                glob.gpx_progress = i;
+            }
+
+            fileInputStream.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -286,7 +407,6 @@ public class MainActivity extends AppCompatActivity {
                 nepasfermer = 1;
             }
         }
-
     }
 
 
@@ -307,43 +427,40 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-//Attention ! Les données arrive ici par paquets : un coup du gsv,
+    //Attention ! Les données arrive ici par paquets de Locservice,
     //un coup du Lat/lon... il peut donc y avoir du null...
     public class MyReceiver extends BroadcastReceiver {
-        public static final String ACTION_RESP ="com.samblancat";
         @Override
         public void onReceive(Context context, Intent intent) {
-            String la, lo, dop, fix;
+            String la, lo;
             double precis;
-
-            //Capte Qualité
-            fix = intent.getStringExtra("Fix");
-            dop = intent.getStringExtra("Hdop");
 
             TextView ptxt = findViewById(R.id.precistxt);
             ImageButton img = findViewById(R.id.gotocmd);
+            TextView gsvtxt = findViewById(R.id.posittxt);
 
-            if (fix!=null) {
-                try { satok = Integer.parseInt(fix); } catch (Exception e) { satok = 0; }
-
-                if (satok > 0) {
+            if (glob.gpsfix > 0) {
                     //ici ne pas faire la.isempty() ou la.length>0 !!!
-                    try { precis = 4 * Double.parseDouble(dop);    // 6 ?
+                    try { precis = 4 * (glob.hdop);    // 6 ?
                     } catch (Exception e) { precis = 99.0; }
                     String t = new DecimalFormat("##0").format(precis);
                     ptxt.setText("Precision " + t + "m");
                     img.setBackgroundResource(R.drawable.finder32);
+                    t = new DecimalFormat("##0.0000").format(mylat);
+                    t += "°/" + new DecimalFormat("##0.0000").format(mylng) + "°";
+                    gsvtxt.setText(t);
                 } else {
                     ptxt.setText(R.string.waitgps);
+                    gsvtxt.setText(glob.gsv);
                     img.setBackgroundResource(R.drawable.finder32red);
                 }
 
-                if ((satok > 0) && (blinking > 0)) {
+                if ((glob.gpsfix > 0) && (blinking > 0)) {
                     ptxt.clearAnimation();
                     blinking = 0;
                 }
 
-                if ((satok < 1) && (blinking < 1)) {
+                if ((glob.gpsfix < 1) && (blinking < 1)) {
                     //Fait clignoter "Waiting pos" tant que pas de fix
                     Animation anim = new AlphaAnimation(0.0f, 1.0f);
                     anim.setDuration(250);  // blinking time
@@ -353,11 +470,6 @@ public class MainActivity extends AppCompatActivity {
                     ptxt.startAnimation(anim);
                     blinking = 1;
                 }
-            }
-
-            //essaie de capter Altitude
-            la = intent.getStringExtra("Alt");
-            try { alt = Double.parseDouble(la); } catch (Exception ignored) {  }
 
             //essaie de capter Position
             la = intent.getStringExtra("Lat");
@@ -366,9 +478,6 @@ public class MainActivity extends AppCompatActivity {
             if ((la!=null)&&(lo!=null)) {
                 try { mylat = Double.parseDouble(la); } catch (Exception ignored) {  }
                 try { mylng = Double.parseDouble(lo); } catch (Exception ignored) {  }
-
-                mylat0 = mylat;
-                mylng0 = mylng;
 
                 TextView postxt = findViewById(R.id.posittxt);
                 if (satok > 0) {

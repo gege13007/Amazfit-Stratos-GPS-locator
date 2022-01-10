@@ -17,7 +17,6 @@ import android.util.Log;
 import android.widget.Toast;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 
 // Crée un service en tache de fond pour le Location Listener & ne pas arrêter les Updates ...
 public class LocService extends Service {
@@ -26,6 +25,7 @@ public class LocService extends Service {
     public MyLocationListener listener;
     SharedPreferences sharedPref;
     double lat, lon;
+    public static final int[] gsvnr= new int[32];
 
     @Override
     public void onCreate() {
@@ -85,18 +85,29 @@ public class LocService extends Service {
             editor.putFloat("dlng", (float) lon);
             editor.apply();
 
+            //pour raz de la vitesse
+            if (glob.oldlat==0) {
+                glob.oldlat = lat;
+                glob.oldlon = lon;
+            }
+
             //Test si new point si Tracking en cours !
             if (glob.tracking) {
                 //Fait à peu près 5m d'écart
-                double x = 10000 * (Math.abs(lat-glob.lastlat)+Math.abs(lon-glob.lastlon));
+                double dtlat = Math.abs(lat-glob.lastlat);
+                double dtlon = Math.abs(lon-glob.lastlon);
+                double x = 10000 * (dtlat + dtlon);
                 if (x > 1) {
                     //test si calc segment de distance
-                    x = Math.pow(Math.abs(glob.lastlat - lat), 2);
-                    x += Math.pow(Math.cos(Math.toRadians(lat)) * Math.abs(glob.lastlon - lon), 2);
+                    x = Math.pow(dtlat, 2);
+                    x += Math.pow(Math.cos(Math.toRadians(lat)) * dtlon, 2);
                     //distance des deux points en m
                     x = 111120 * Math.sqrt(x);
                     //Distance cumulée track
                     glob.realdist += x;
+
+                    glob.lastlat=lat;
+                    glob.lastlon=lon;
 
                     String locname = Integer.toString(glob.nbtracking++);
                     Location newpt = new Location(locname);
@@ -105,12 +116,9 @@ public class LocService extends Service {
                     newpt.setAltitude(loc.getAltitude());
                     //stocke date+heure dans le 'Provider'
                     newpt.setProvider(fdate.format(c.getTime())+"T"+ftime.format(c.getTime())+"Z");
-                    glob.mygpxList.add(newpt);
+                    glob.gpxList.add(newpt);
                 }
             }
-
-            glob.lastlat=lat;
-            glob.lastlon=lon;
             glob.lastalt=loc.getAltitude();
         }
 
@@ -127,44 +135,69 @@ public class LocService extends Service {
         }
     };
 
+
+    //------------- Réception d'un Message NMEA ------------
     GpsStatus.NmeaListener nmeaListener = new GpsStatus.NmeaListener() {
         public void onNmeaReceived(long timestamp, String nmea) {
+            int tt, n, nn;
+            String txt="";
             String[] nmeaSplit = nmea.split(",");
-            //Capte le nb de sats de GGA
-            if (nmeaSplit[0].equalsIgnoreCase("$GPGSV")) {
-                try {
-                    String txt = nmeaSplit[3];
-                    Intent broadCastIntent = new Intent();
-                    broadCastIntent.setAction("com.samblancat");
-                    broadCastIntent.putExtra("Sat", txt);
-                    sendBroadcast(broadCastIntent);
+
+            String cmd = nmeaSplit[0].substring(3,6);
+            Log.e("oncmd : ",cmd );
+            //Capte le nb de sats de GSV
+            //   0    1 2 3   4   5  6  7           11            15           19
+            // $GPGSV,4,2,13, 12,75,283, , 15,17,175, , 17,07,034, , 19,26,046,00,0*60
+            if (cmd.equalsIgnoreCase("GSV")) {
+                Log.e("onGSV : ",nmea );
+                //index de no de phrase GSV
+                tt = 4 * (-1+Integer.parseInt(nmeaSplit[2]));
+                //parcours la phrase
+                for (n=7, nn=0; n<20; n+=4, nn++) {
+                    try { if (Integer.parseInt(nmeaSplit[n])>0) gsvnr[tt+nn]=Integer.parseInt(nmeaSplit[n-3]); }  //Integer.parseInt(nmeaSplit[n]); }
+                    catch (Exception e) { gsvnr[tt+nn]=0; }
                 }
-                catch (Exception e) {
-                    e.printStackTrace();
+                //retranscris les SNR dans l'ordre et en string
+                txt="";
+                for (n=0; n<30; n++) {
+                    nn=gsvnr[n];
+                    if (nn>0) { txt += nn+" "; }
                 }
+                glob.gsv=txt;
+                Log.e("onGSVtxt : ", txt);
             }
-
-            //Capte la Speed de GGA
-            if (nmeaSplit[0].equalsIgnoreCase("$GPGGA")) {
-
-                Intent broadCastIntent = new Intent();
-                broadCastIntent.setAction("com.samblancat");
-
+            //Capte le Fix / Alt / Dop de GGA
+            else if (cmd.equalsIgnoreCase("GGA")) {
                 //Extrait Fix (0=no 1=ok 2=dgps)
-                String txt=nmeaSplit[6];
-                broadCastIntent.putExtra("Fix", txt);
-                if (txt.equals("0")) glob.gpsfix=0; else glob.gpsfix=1;
+                txt=nmeaSplit[6];
+                if (txt.equals("0")) {
+                    glob.gpsfix = 0;
+                    glob.oldalt=0;
+                }
+                else glob.gpsfix=1;
 
                 //Extrait HDOP
                 txt=nmeaSplit[8];
-                broadCastIntent.putExtra("Hdop", txt);
-
+                try { glob.hdop = Double.parseDouble(txt); }
+                catch (Exception e) { glob.hdop = 99.0; }
                 //Extrait Altitude
                 txt=nmeaSplit[9];
-                broadCastIntent.putExtra("Alt", txt);
-
-                sendBroadcast(broadCastIntent);
+                glob.oldalt = Double.parseDouble(txt);
             }
+            //Test si Autre...VTG...
+            else if (cmd.equalsIgnoreCase("VTG")) {
+                //Extrait VTG
+                txt=nmeaSplit[7];
+                Log.e("onVTG : ",txt);
+                try { glob.vtg = Double.parseDouble(txt); }
+                catch (Exception e) { glob.vtg = 0.0; }
+            }
+
+            //Envoie un broadcast quelconque pour Maj de MainActivity
+            Intent broadCastIntent = new Intent();
+            broadCastIntent.setAction("com.samblancat");
+            broadCastIntent.putExtra("Sat", " ");
+            sendBroadcast(broadCastIntent);
         }
     };
 }

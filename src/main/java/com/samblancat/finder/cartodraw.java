@@ -17,7 +17,9 @@ import android.location.Location;
 import android.media.MediaScannerConnection;
 import android.os.Environment;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -30,7 +32,8 @@ import java.util.Calendar;
 import java.util.List;
 import static android.content.Context.MODE_PRIVATE;
 import static android.graphics.Color.rgb;
-import static com.samblancat.finder.Selectpos.decodeGPX;
+import static com.samblancat.finder.MainActivity.decodeGPX;
+
 
 public class cartodraw extends View {
     public double wx , wy, cx, cy;
@@ -44,8 +47,6 @@ public class cartodraw extends View {
     public double mylat0, mylng0;
     public String wptname="";
     public SharedPreferences sharedPref;
-    //Track visualisée
-    List<Location> gpxList=null;
     //nb de wpt dans liste en cours
     public int nbwpt=0;
     Context mContext;
@@ -64,14 +65,16 @@ public class cartodraw extends View {
         sharedPref = mContext.getSharedPreferences("POSPREFS", MODE_PRIVATE);
         glob.gpxini = sharedPref.getString("gpxini","gpxlocator.gpx");
 
-        try { zoom = sharedPref.getInt("zoom", 9);
-          //Retrouve last Position courante pour tri / distances
-          clat = sharedPref.getFloat("clat", (float) 43.3);
-          clon = sharedPref.getFloat("clon", (float) 5.2);
-        } catch (Exception e) {
-            zoom = 9;
+        //Retrouve last Position de la carte
+        zoom = glob.mapzoom0;       // sharedPref.getInt("zoom", 9);
+        clat = glob.maplat0;        // sharedPref.getFloat("clat", (float) 43.3);
+        clon = glob.maplon0;        // sharedPref.getFloat("clon", (float) 5.2);
+        if (glob.maplat0==0) {
             clat = 43;
             clon = 5;
+        }
+        if (glob.mapzoom0==0) {
+            zoom = 9;
         }
 
         //Test si gpxdata existe
@@ -80,6 +83,10 @@ public class cartodraw extends View {
         if ( !dir0.exists() ) return;
         String path = path0 +"/" + glob.gpxini;
         final File gpxFile = new File(path);
+        if ( !gpxFile.exists() ) {
+            Toast.makeText(mContext, "File not found !", Toast.LENGTH_LONG).show();
+            return;
+        }
 
         //Largeur et centre de l'écran
         wx = (double) getResources().getDisplayMetrics().widthPixels;
@@ -90,24 +97,24 @@ public class cartodraw extends View {
         //Retrouve last position réelle
         dlat = sharedPref.getFloat("dlat",  (float) 43.3);
         dlon = sharedPref.getFloat("dlng",(float) 5.2);
+
         mylat0 = sharedPref.getFloat("lat0",  (float) 43.3);
         mylng0 = sharedPref.getFloat("lng0", (float) 5.2);
         wptname = sharedPref.getString("nom", "");
 
-        // Extrait la liste Array des 'name'
-        gpxList = decodeGPX(gpxFile, dlat, dlon, 0);    // pas de tri wpt !
+        // La liste des Wpts est préchargée dans 'gpxlist'
 
+        Log.e("TAG ", String.valueOf(glob.gpxList.size()));
         altmin=9999; altmax=-9999;
         //Calc echelle & altit moyenne
-        for (int nn = 0; nn < gpxList.size(); nn++) {
-            Location loc = gpxList.get(nn);
+        for (int nn = 0; nn < glob.gpxList.size(); nn++) {
+            Location loc = glob.gpxList.get(nn);
             z= loc.getAltitude();
             if (z>altmax) altmax=z;
             if (z<altmin) altmin=z;
         }
         altmoy=(altmax+altmin)/2;
         altspan=(altmax-altmin)/2;
-//        Log.d("cartok: ", "lsize="+gpxList.size());
         setKeepScreenOn(true);
     }
 
@@ -140,11 +147,14 @@ public class cartodraw extends View {
         yt = (yt * n) / 2;
         ytile = (int) (Math.rint(yt));
 
-//        Log.d("Screen?", " ");
-//        Log.d("Screen?", "xtile="+ xtile +" ytile="+ ytile);
-
         //Charge la Tile 0 principale du Centre écran
         getTile(canvas, xtile, ytile);
+
+        //Limites en lat°/lon° de l'écran
+        double lonG = clon + (0 - cx)/pixdegX;
+        double lonD = clon + (wx - cx)/pixdegX;
+        double latN = clat + (wy - cy)/pixdegY;
+        double latS = clat + (0 - cy)/pixdegY;
 
         //Test si manque un côté ?
         if (x0 + (bmp_x * 256) < wx)             // NOIR à Droite
@@ -170,70 +180,86 @@ public class cartodraw extends View {
         paint.setAntiAlias(true);
         paint.setStrokeWidth(2);
 
-        if ((!glob.tracking) && (gpxList != null)) {
+        if ((!glob.tracking) && (glob.gpxList != null)) {
             //Display points
-            nbwpt = gpxList.size();
+            nbwpt = glob.gpxList.size();
             //Increment de point à point
             int wptmodulo = 1;
             //Reduit le nb de points affichés à 200 maxi
             if (nbwpt > 100) wptmodulo = (int) Math.floor(nbwpt / 200.0);
             if (wptmodulo < 1) wptmodulo = 1;
-            double[] wptX = new double[nbwpt];
-            double[] wptY = new double[nbwpt];
-            double[] wptZ = new double[nbwpt];
-            int nwptvis = 0;
-            for (int nn = 0, countname = 0; nn < nbwpt; nn += wptmodulo, countname++) {
-                Location loc = gpxList.get(nn);
-                wptX[nn] = cx + (loc.getLongitude() - clon) * pixdegX;
-                wptY[nn] = cy - (loc.getLatitude() - clat) * pixdegY;
-                wptZ[nn] = loc.getAltitude();
-                //compte les pts vraiment visibles
-                if ((wptX[nn] > 0) && (wptX[nn] < wx) && (wptY[nn] > 0) && (wptY[nn] < wy))
-                    nwptvis++;
-            }
 
-            //Adapte nb display de wptnames max 1/8 nb de wpt visibles
-            int namodulo = Math.round(nwptvis >> 3);
             //Dessin des points définitifs
-            for (int nn = 0, countname = 0; nn < nbwpt; nn += wptmodulo, countname++) {
-                Location loc = gpxList.get(nn);
-                x = wptX[nn];
-                y = wptY[nn];
-                z = wptZ[nn];
+            int nbwptvis = 0;
+            for (int nn = 0; nn < nbwpt; nn++) {
+                Location loc = glob.gpxList.get(nn);
                 //Pset le waypoint
-                if ((x > 0) && (x < wx) && (y > 0) && (y < wy)) {
-                    int rr = 0, bb = 0, gg;
-                    gg = (int) (255 * ((altspan - Math.abs(z - altmoy)) / altspan));
-                    if (z > altmoy) rr = (int) (255 * (z - altmoy) / (altspan));
-                    else bb = (int) (255 * (altmoy - z) / (altspan));
-                    paint.setColor(rgb(rr, gg, bb));
-                    paint.setStyle(Paint.Style.FILL);
-                    canvas.drawCircle(Math.round(x), Math.round(y), 3, paint);
-                }
-                //Trace une droite ?
-                paint.setColor(rgb(0x70, 0x70, 0x70));
-                if (first > 0) canvas.drawLine(oldx, oldy, (float) x, (float) y, paint);
-                oldx = (float) x;
-                oldy = (float) y;
-                first = 1;
-                //Met le wptname ? (10 au maximum)
-                if (countname > namodulo) countname = 0;
-                if (countname < 1) {
-                    String wn = loc.getProvider();
-                    //N'AFFICHE PAS les noms du type "43.2210/5.2550"
-                    if (!wn.contains("/")) {
-                        paint.setColor(rgb(0x70, 0x70, 0x70));
-                        paint.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
-                        paint.setTextSize(19);
-                        canvas.drawText(wn, (float) x - 20, (float) y - 19, paint);
+                if ((loc.getLongitude() > lonG) && (loc.getLongitude() < lonD)) {
+                    if ((loc.getLatitude() > latS) && (loc.getLatitude() < latN)) {
+                        nbwptvis++;
                     }
                 }
             }
+            //Adapte nb display de wptnames modulo = 1/8 nb des pt visibles
+            int namodulo = Math.round(nbwptvis / 5);
+            int nbwptvu=0;
+            for (int nn = 0, countname = 0; nn < nbwpt; nn++, countname++) {
+                Location loc = glob.gpxList.get(nn);
+                //Pset le waypoint
+                if ( (loc.getLongitude() > lonG) && (loc.getLongitude() < lonD) ) {
+                    if ( (loc.getLatitude() > latS) && (loc.getLatitude() < latN) ) {
+                        x = cx + (loc.getLongitude() - clon) * pixdegX;
+                        y = cy - (loc.getLatitude() - clat) * pixdegY;
+                        z = loc.getAltitude();
+                        int rr = 0, bb = 0, gg;
+                        if (z==0)
+                            paint.setColor(rgb(0xfc, 0x80, 0));
+                        else {
+                            gg = (int) (255 * ((altspan - Math.abs(z - altmoy)) / altspan));
+                            if (z > altmoy) rr = (int) (255 * (z - altmoy) / (altspan));
+                            else bb = (int) (255 * (altmoy - z) / (altspan));
+                            paint.setColor(rgb(rr, gg, bb));
+                        }
+                        paint.setStyle(Paint.Style.FILL);
+                        canvas.drawCircle(Math.round(x), Math.round(y), 4, paint);
+
+                        //Trace une droite ?
+                        if (glob.NbTrk > 0) {
+                            paint.setColor(rgb(0x70, 0x70, 0x70));
+                            if (first > 0) {
+                                double dd = Math.abs(oldx - x) + Math.abs(oldy - y);
+                                if (dd < 200)
+                                    canvas.drawLine(oldx, oldy, (float) x, (float) y, paint);
+                            }
+                        }
+
+                        oldx = (float) x;
+                        oldy = (float) y;
+                        first = 1;
+
+                        //Met le wptname ? (10 au maximum)
+                        if (countname > namodulo) countname = 0;
+                        if ( (countname < 1) && (glob.shownames>0) ) {
+                            String wn = loc.getProvider();
+                            //N'AFFICHE PAS les noms du type "43.2210/5.2550"
+                            if (!wn.contains("/")) {
+                                paint.setColor(rgb(0x70, 0x70, 0x70));
+                                paint.setTypeface(Typeface.defaultFromStyle(Typeface.NORMAL));
+                                paint.setTextSize(19);
+                                canvas.drawText(wn, (float) x - 20, (float) y - 19, paint);
+                                nbwptvu++;
+                            }
+                        }
+                    }
+                }
+            }
+            Log.e("nbwptvis= ", String.valueOf(nbwptvis));
+            Log.e("nbwptvu= ", String.valueOf(nbwptvu));
         }
         //------------------ TRACE Tracking en LIVE ---------------------------
-        else if (glob.mygpxList != null) {
+        else if (glob.gpxList != null) {
             //Display points
-            nbwpt = glob.mygpxList.size();
+            nbwpt = glob.gpxList.size();
             if (nbwpt > 1) {
                 //Increment de point à point
                 int wptmodulo = 1;
@@ -244,7 +270,7 @@ public class cartodraw extends View {
                 double[] wptY = new double[nbwpt];
                 int nwptvis = 0;
                 for (int nn = 0; nn < nbwpt; nn += wptmodulo) {
-                    Location loc = glob.mygpxList.get(nn);
+                    Location loc = glob.gpxList.get(nn);
                     wptX[nn] = cx + (loc.getLongitude() - clon) * pixdegX;
                     wptY[nn] = cy - (loc.getLatitude() - clat) * pixdegY;
                     //compte les pts vraiment visibles
@@ -253,20 +279,21 @@ public class cartodraw extends View {
                 }
 
                 //Adapte nb display de wptnames max 1/8 nb de wpt visibles
-                int namodulo = Math.round(nwptvis >> 3);
+                int namodulo = Math.round(nwptvis / 5);
                 //Dessin des points
                 for (int nn = 0; nn < nbwpt; nn += wptmodulo) {
-                    Location loc = glob.mygpxList.get(nn);
+                    Location loc = glob.gpxList.get(nn);
                     x = wptX[nn];
                     y = wptY[nn];
                     //Pset le waypoint
                     if ((x > 0) && (x < wx) && (y > 0) && (y < wy)) {
+                        paint.setStrokeWidth(3);
                         paint.setColor(Color.BLUE);
-                        paint.setStyle(Paint.Style.FILL);
+                        paint.setStyle(Paint.Style.STROKE);
                         canvas.drawCircle(Math.round(x), Math.round(y), 2, paint);
                     }
                     //Trace une droite ?
-                    paint.setStyle(Paint.Style.STROKE);
+                    paint.setStyle(Paint.Style.FILL);
                     if (first > 0) canvas.drawLine(oldx, oldy, (float) x, (float) y, paint);
                     oldx = (float) x;
                     oldy = (float) y;
@@ -280,20 +307,22 @@ public class cartodraw extends View {
         y = cy - ((dlat - clat) * pixdegY);
         if ((x > 0) && (x < wx) && (y > 0) && (y < wy)) {
             //Pset le point actuel réel
-            if (glob.gpsfix != 0) paint.setARGB(0xe0, 0x10, 0x10, 0x10);
-            else paint.setColor(Color.RED);
-            paint.setStyle(Paint.Style.STROKE);
-            paint.setStrokeWidth(3);
-            canvas.drawCircle(Math.round(x), Math.round(y), 7, paint);
+            if (glob.gpsfix > 0)
+                paint.setColor(Color.GREEN);
+            else
+                paint.setColor(Color.RED);
+            paint.setStyle(Paint.Style.FILL);
+            paint.setStrokeWidth(2);
+            canvas.drawCircle(Math.round(x), Math.round(y), 8, paint);
             canvas.drawLine((float) (x - 12), (float) (y), (float) (x + 12), (float) (y), paint);
             canvas.drawLine((float) (x), (float) (y - 12), (float) (x), (float) (y + 12), paint);
         }
 
         //Recentrage auto en mode track saving
-        if (glob.mygpxList != null) {
-            if ( (Math.abs(x -cx) + Math.abs(y-cy)) > (cx+cy)/2.2 ) {
-                centermap();
-            }
+        if (glob.gpxList != null) {
+//            if ( (Math.abs(x -cx) + Math.abs(y-cy)) > (cx+cy)/2.2 ) {
+//                centermap();
+//            }
         }
 
         //Dessine Trait à Destination ?
@@ -304,7 +333,7 @@ public class cartodraw extends View {
             Paint paint2 = new Paint();
             paint2.setStyle(Paint.Style.STROKE);
             paint2.setColor(Color.BLUE);
-            paint2.setStrokeWidth(2);
+            paint2.setStrokeWidth(3);
    //         paint2.setPathEffect(new DashPathEffect(new float[]{10,10},20));
    //         paint2.setAntiAlias(true);
             canvas.drawLine((float) (x), (float) (y), (float) (x2), (float) (y2), paint2);
@@ -377,9 +406,9 @@ public class cartodraw extends View {
             //Affiche Vitesse km/h
             ry = (float) (wy * 0.36);
             paint.setTextSize(20);
-            canvas.drawText("Spd", (float) (cx-90), ry-20, paint);
+            canvas.drawText("Spd", (float) (cx-100), ry-20, paint);
             paint.setTextSize(48);
-            String vt = new DecimalFormat("0.0").format(glob.realspeed);
+            String vt = new DecimalFormat("0.0").format(glob.vtg);
             if (glob.gpsfix>0)
                 canvas.drawText(vt+" km/h", (float) (cx-64), ry, paint);
             else
@@ -388,7 +417,7 @@ public class cartodraw extends View {
             //Distance cumulée track
             if (glob.tracking){
                 paint.setTextSize(20);
-                canvas.drawText("Dst", (float) (cx-85), ry+30, paint);
+                canvas.drawText("Dst", (float) (cx-95), ry+30, paint);
                 paint.setTextSize(48);
                 vt = glob.dtotext(glob.realdist);
                 canvas.drawText(vt, (float) (cx - 60), ry+50, paint);
@@ -396,7 +425,7 @@ public class cartodraw extends View {
 
             //Altitude
             paint.setTextSize(20);
-            canvas.drawText("Alt", (float) (cx-85), ry+80, paint);
+            canvas.drawText("Alt", (float) (cx-95), ry+80, paint);
             paint.setTextSize(48);
             vt = glob.dtotext(glob.lastalt);
             if (glob.gpsfix>0)
@@ -458,14 +487,14 @@ public class cartodraw extends View {
 
 
     //Va charger et affiche la tile en Bitmap resizé !
-    public int drawTile(Canvas canvas, int xtil, int ytil, float x0, float y0) {
+    public void drawTile(Canvas canvas, int xtil, int ytil, float x0, float y0) {
         Bitmap myBitmap;
         //Test si gpxdata existe
         File dir0 = new File(Environment.getExternalStorageDirectory().toString()+"/OSMaps");
         String path0 = dir0.toString();
         if ( !dir0.exists() ) {
             Toast.makeText(mContext, "No 'OSMaps' directory !", Toast.LENGTH_LONG).show();
-            return 0;
+            return;
         }
         String tilename = path0 + "/" + zoom + "/" + xtil + "/" + ytil + ".png";
         File file = new File(tilename);
@@ -485,7 +514,6 @@ public class cartodraw extends View {
 
         //Dessine la Tile 0
         canvas.drawBitmap(sizedBitmap, x0, y0, null);
-        return 1;
     }
 
 
@@ -533,7 +561,7 @@ public class cartodraw extends View {
                 public void onClick(DialogInterface dialog, int which) {
                     glob.tracking = true;
                     //start list
-                    glob.mygpxList = new ArrayList<>();
+                    glob.gpxList = new ArrayList<>();
                     //First point
                     glob.lastlat=dlat;
                     glob.lastlon=dlon;
@@ -562,6 +590,9 @@ public class cartodraw extends View {
                             String formatdate = df.format(c.getTime());
                             String nom = "gs" + "-" + formatdate + ".gpx";
                             WriteMyGPX(nom);
+
+                            Toast.makeText(mContext, glob.gpxList.size()+" points", Toast.LENGTH_LONG).show();
+
                             //Sauve Fin de Tracking
                             SharedPreferences.Editor editor = sharedPref.edit();
                             editor.putInt("track", 0);
@@ -611,10 +642,10 @@ public class cartodraw extends View {
     public void centermap() {
         clat = dlat;
         clon = dlon;
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putFloat("clat", (float) clat);
-        editor.putFloat("clon", (float) clon);
-        editor.apply();
+                                    // SharedPreferences.Editor editor = sharedPref.edit();
+        glob.mapzoom0 = zoom;       // editor.putFloat("clat", (float) clat);
+        glob.maplat0 = clat;        // editor.putFloat("clon", (float) clon);
+        glob.maplon0 = clon;        //editor.apply();
         invalidate();
     }
 
@@ -627,10 +658,10 @@ public class cartodraw extends View {
         if (clat<-89.5) clat=-89.5;
         if (clon>180) clon=-179.999;
         if (clon<-180) clon=179.999;
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putFloat("clat", (float) clat);
-        editor.putFloat("clon", (float) clon);
-        editor.apply();
+        // SharedPreferences.Editor editor = sharedPref.edit();
+        glob.mapzoom0 = zoom;       // editor.putFloat("clat", (float) clat);
+        glob.maplat0 = clat;        // editor.putFloat("clon", (float) clon);
+        glob.maplon0 = clon;        //editor.apply();
         invalidate();
     }
 
@@ -640,9 +671,7 @@ public class cartodraw extends View {
         if (zoom <= 16) {
             //Zoome
             zoom++;
-            SharedPreferences.Editor editor = sharedPref.edit();
-            editor.putInt("zoom", zoom);
-            editor.apply();
+            glob.mapzoom0 = zoom;
             //ReTrace
             invalidate();
         }
@@ -653,9 +682,7 @@ public class cartodraw extends View {
         if (zoom > 3) {
             //dézoome
             zoom--;
-            SharedPreferences.Editor editor = sharedPref.edit();
-            editor.putInt("zoom", zoom);
-            editor.apply();
+            glob.mapzoom0 = zoom;
             //ReTrace
             invalidate();
         }
@@ -664,7 +691,7 @@ public class cartodraw extends View {
     //Ajoute un wpt au fichier gpx
     public void WriteMyGPX(String nom) {
 
-        int nb = glob.mygpxList.size();
+        int nb = glob.gpxList.size();
         if (nb==0) return;
 
         Calendar c = Calendar.getInstance();
@@ -709,7 +736,7 @@ public class cartodraw extends View {
             bw.write("<trkseg>\r\n");
 
             for (int nn = 0; nn < nb; nn++) {
-                Location loc = glob.mygpxList.get(nn);
+                Location loc = glob.gpxList.get(nn);
                 //Insertion du wpt a la fin
                 bw.write("<trkpt lat=\"" + loc.getLatitude() + "\" lon=\"" + loc.getLongitude() + "\">\r\n");
                 bw.write("<ele>" + loc.getAltitude() + "</ele>\r\n");
@@ -731,5 +758,4 @@ public class cartodraw extends View {
         MediaScannerConnection.scanFile(mContext,
                 new String[]{gpx.getAbsolutePath()}, null, null);
     }
-
 }

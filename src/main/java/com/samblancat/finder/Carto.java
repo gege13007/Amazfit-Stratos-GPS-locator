@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.view.ViewDebug;
 import android.widget.Toast;
 
 import java.util.Timer;
@@ -39,30 +40,33 @@ public class Carto extends AppCompatActivity {
         //Mode de vue map - map+incrust - sortie
         glob.modevue = 0;
 
+        //First point pour realspeed
+        glob.oldlat=dlat;
+        glob.oldlon=dlon;
+
+        cartoview = new cartodraw(this);
+        setContentView(cartoview);
+
         //Lance timer toutes les 6 secondes pour calc vitesse
         mytime = new Timer();
         TimerTask timerTaskObj = new TimerTask() {
             public void run() {
-                if (glob.oldlat!=0) {
-                    //Calc distance à oldlat/oldlon
-                    double x = Math.pow(Math.abs(glob.lastlat - glob.oldlat), 2);
-                    x += Math.pow(Math.cos(Math.toRadians(glob.lastlat)) * Math.abs(glob.lastlon - glob.oldlon), 2);
-                    x = Math.sqrt(x);
-                    //distance des deux points en 5 sec
-                    x = 111120 * x;
-                    //Vitesse instant (moyenne pondérée / 3)
-                    glob.realspeed += (1.2 * x);    // 2 * ( 3.600 / 6 )
-                    glob.realspeed /= 3;
-                }
+                //Calc distance à oldlat/oldlon
+                double x = Math.pow(Math.abs(dlat - glob.oldlat), 2);
+                x += Math.pow(Math.cos(Math.toRadians(dlat)) * Math.abs(dlon - glob.oldlon), 2);
+                x = Math.sqrt(x);
+                //distance en km des deux points en 5 sec (1° => 111.12km en 1 heure)
+                x = 111.12 * 720 * x;
+                //Vitesse instant (moyenne pondérée : 2 last + 1 ancienne))
+                glob.realspeed += (2 * x);
+                glob.realspeed /= 3;
+
                 //sauve last posit
-                glob.oldlat=glob.lastlat;
-                glob.oldlon=glob.lastlon;
+                glob.oldlat=dlat;
+                glob.oldlon=dlon;
             }
         };
-        mytime.schedule(timerTaskObj, 0, 6000);
-
-        cartoview = new cartodraw(this);
-        setContentView(cartoview);
+        mytime.schedule(timerTaskObj, 0, 5000);
 
         // on initialise le receiver de service/broadcast
         receiver = new Carto.MyReceiver();
@@ -76,18 +80,21 @@ public class Carto extends AppCompatActivity {
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
         switch(ev.getAction()) {
+            //debut appui sur ecran
             case MotionEvent.ACTION_DOWN:
                 x1 = ev.getX();
                 y1 = ev.getY();
                 //pour test detection Long Click
                 touchtime = System.currentTimeMillis();
                 break;
+
+            // fin appui - ou scroll ?
             case MotionEvent.ACTION_UP:
                 x2 = ev.getX();
                 y2 = ev.getY();
                 //Test si long click ?
                 touchtime = (System.currentTimeMillis()-touchtime);
-                if ( (touchtime>1500) && (Math.abs(x2 - x1) < 4) && (Math.abs(y2 - y1) < 4) ) {
+                if ( (touchtime>1500) && (Math.abs(x2 - x1) <40) && (Math.abs(y2 - y1) < 40) ) {
                     // Lance choix multiple !
                     cartoview.StoreNewWpt(x2, y2);
                 }
@@ -119,6 +126,7 @@ public class Carto extends AppCompatActivity {
                     x2=0; y2=0;
                 }
                 break;
+
             case MotionEvent.ACTION_MOVE:
                 x2 = ev.getX();
                 y2 = ev.getY();

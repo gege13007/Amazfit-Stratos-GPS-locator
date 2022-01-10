@@ -12,7 +12,6 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.location.Location;
-import android.media.MediaScannerConnection;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AlertDialog;
@@ -24,18 +23,12 @@ import android.view.animation.Animation;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.List;
 
-import static com.samblancat.finder.Selectpos.decodeGPX;
+import static com.samblancat.finder.MainActivity.decodeGPX;
 
 public class Scan extends AppCompatActivity implements SensorEventListener {
     private BroadcastReceiver receiver;
@@ -101,17 +94,32 @@ public class Scan extends AppCompatActivity implements SensorEventListener {
         ImageView imgView= findViewById(R.id.boussole);
         imgView.setOnLongClickListener(new View.OnLongClickListener() {
             public boolean onLongClick(View arg0) {
-                // Confirme sauver new wpt
-                Calendar c = Calendar.getInstance();
-                SimpleDateFormat df = new SimpleDateFormat("yy-MM-dd/HH:mm:ss");
-                String formatdate = df.format(c.getTime());
-                //prend mylat/lng qui sont filtrés du 0.0
-                if ((mylat!=0)&&(mylng!=0)) {
-                    glob.appendGPX(mContext, mylat, mylng, alt, formatdate);
-                    String togo = new DecimalFormat("#0.0000").format(mylat);
-                    togo += "/" + new DecimalFormat("#0.0000").format(mylng);
-                    Toast.makeText(mContext, "Position "+togo+" saved to " + glob.gpxini, Toast.LENGTH_LONG).show();
-                }
+                AlertDialog.Builder builder = new AlertDialog.Builder(mContext, R.style.myALERT);
+                builder.setTitle("Create new point ?");
+                builder.setCancelable(false);
+                builder.setMessage("Save new Wpt");
+                builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Confirme sauver new wpt
+                        Calendar c = Calendar.getInstance();
+                        SimpleDateFormat df = new SimpleDateFormat("yy-MM-dd/HH:mm:ss");
+                        String formatdate = df.format(c.getTime());
+                        //prend mylat/lng qui sont filtrés du 0.0
+                        if ((mylat != 0) && (mylng != 0)) {
+                            glob.appendGPX(mContext, mylat, mylng, alt, formatdate);
+                            String togo = new DecimalFormat("#0.0000").format(mylat);
+                            togo += "/" + new DecimalFormat("#0.0000").format(mylng);
+                            Toast.makeText(mContext, "Position " + togo + " saved to " + glob.gpxini, Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+                builder.setNegativeButton("Annuler", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+                builder.setIcon(android.R.drawable.ic_dialog_alert);
+                builder.show();
                 return true;
             }
         });
@@ -133,7 +141,6 @@ public class Scan extends AppCompatActivity implements SensorEventListener {
         super.onPause();
         //Arrete le Sensor listener
         if (compasok>0) mSensorManager.unregisterListener(this);
-        //Log.d("TAG : ", "onPause: ");
     }
 
     @Override
@@ -147,7 +154,6 @@ public class Scan extends AppCompatActivity implements SensorEventListener {
             Sensor magnetSensor = mSensorManager.getDefaultSensor(3);
             mSensorManager.registerListener(this, magnetSensor, SensorManager.SENSOR_DELAY_NORMAL);
         }
-       // Log.d("TAG : ", "onResume");
     }
 
     //POUR GESTION MAGNETIC SENSOR
@@ -169,23 +175,20 @@ public class Scan extends AppCompatActivity implements SensorEventListener {
 
 
     public Location getNextWpt(Double lat, Double lng) {
-        int tri;
-        // Extrait la liste Array des 'name'
         //Reprend le Gpx de base
         sharedPref = getBaseContext().getSharedPreferences("POSPREFS", MODE_PRIVATE);
-        tri = sharedPref.getInt("sortbydist", 1);
         String path0 = Environment.getExternalStorageDirectory().toString()+"/gpxdata";
         String path = path0 + "/" + sharedPref.getString("gpxini","gpxlocator.gpx");
 
         File gpx = new File(path);
-        final List<Location> gpxList = decodeGPX(gpx, lat, lng, tri);        // liste des Pos des Wpts
+        decodeGPX(gpx, lat, lng);        // liste des Pos des Wpts
         //Si Aucun Waypoints -> efface - recree
-        if (gpxList.size() > 1) {
+        if (glob.gpxList.size() > 1) {
             //Va chercher le wptname qui suit l'actuel
-            for (int nn = 0; nn < -1+gpxList.size(); nn++) {
-                String tt = (gpxList.get(nn)).getProvider();
+            for (int nn = 0; nn < -1 + glob.gpxList.size(); nn++) {
+                String tt = (glob.gpxList.get(nn)).getProvider();
                 if (wptname.equals(tt))
-                    return (gpxList.get(nn+1));
+                    return (glob.gpxList.get(nn+1));
             }
         }
         return(null);
@@ -195,15 +198,13 @@ public class Scan extends AppCompatActivity implements SensorEventListener {
     //Attention ! Les données arrive ici par paquets : un coup du gsv,
     //un coup du Lat/lon... il peut donc y avoir du null...
     public class MyReceiver extends BroadcastReceiver {
-        public static final String ACTION_RESP ="com.samblancat";
         @Override
         public void onReceive(Context context, Intent intent) {
             String la, lo, fix;
             AlertDialog.Builder builder;
             int satok;
-            double al;
 
-            TextView  dtxt = findViewById(R.id.todisttxt);
+            TextView dtxt = findViewById(R.id.todisttxt);
             TextView atxt = findViewById(R.id.speedtxt);
             ImageView imb = findViewById(R.id.boussole);
 
@@ -228,12 +229,9 @@ public class Scan extends AppCompatActivity implements SensorEventListener {
             }
 
             //essaie de capter Altitude
-            String alti = intent.getStringExtra("Alt");
-            if (alti!=null) {
-                try { alt = Double.parseDouble(alti); }
-                catch (Exception e) { alt=0; }
+            if (glob.oldalt!=0) {
                 DecimalFormat altprec = new DecimalFormat("###0");
-                atxt.setText("alt "+altprec.format(alt)+"m");
+                atxt.setText("alt "+altprec.format(glob.oldalt)+"m");
             }
 
             la =  intent.getStringExtra("Lat");
@@ -340,7 +338,6 @@ public class Scan extends AppCompatActivity implements SensorEventListener {
                         });
                         builder.setIcon(android.R.drawable.ic_dialog_alert);
                         builder.show();
-
                     }
                 }
                 //Si En approche ?

@@ -6,7 +6,6 @@ import android.location.Location;
 import android.media.MediaScannerConnection;
 import android.os.Environment;
 import android.widget.Toast;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -27,21 +26,47 @@ public class glob {
     //no du nouveau point stocké
     static public int nbtracking = 0;
     //Track list en cours d'acquisition
-    static public List<Location> mygpxList = null;
+    static public List<Location> gpxList = null;
+
+    //info sur le GPX en cours
+    static public int NbPts=0;
+    static public int NbTrk=0;   // si 1 c'est un TRKSEG
+
+    //Centre de l'écran map (sauvé ou changé avec decodeGPX)
+    static public double maplat0, maplon0;
+    static public int mapzoom0;
+
     //dernière position sauvée
     static public double lastlat = 0, lastlon = 0, lastalt=0;
-    //dernier point / vitesse
-    static public double oldlat = 0, oldlon = 0;
+    //dernier point pour calc Distance
+    static public double oldlat, oldlon, oldalt;
     // =1 Fix GPS ok , =0 no gps !
     static public int gpsfix = 0;
+    // Facteur HDOP de precision GPS
+    static public Double hdop = 99.0;
+    // Nb de satellites en vue
+    static public String gsv = "";
+    //Vitesse en km/h de VTG
+    static public double vtg = 0;
+
     //Changement mode vue carto - 0 carte seule - 1 carte incrust - 2 sortie map
     static public int modevue=0;
+
+    //Flag si show Wpt names sur Maps
+    static public int shownames=0;
+
     // Fichier gpx en cours de visu (sauvé en sharedpref)
     static public String gpxini;
 
     //Pour calc distance entre 2 last GPS points
     static public double realspeed=0;         // vitesse
     static public double realdist=0;          // distance cumulée du track
+
+    //pour progress bar -> decodeGPX
+    static public int gpx_progress=0;
+
+    //pour tests divers
+    static public int debug=0;
 
     //Transforme le time long en sec -> duree en texte
     static public String timeotext(long duree) {
@@ -139,5 +164,4 @@ public class glob {
         MediaScannerConnection.scanFile(mContext,
                 new String[]{gpx.getAbsolutePath()}, null, null);
     }
-
 }
