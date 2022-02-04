@@ -1,8 +1,8 @@
 # Appli GPS avec cartographie OSMaps & GPX traceur pour montre Android      ([english version](/readme-eng.md) )
 ----------------------------------------------------------------------
-Voici la dernière version 9.5 (début 2022) de GPS Maps & compass Locator pour montre Amazfit Android (testée sur Xiaomi Amazfit Stratos 2, Stratos 3, PACE, et SUUNTO...).
+Voici la dernière version 9.5 de mon appli GPS OSMaps & compass Locator pour montre connectée Amazfit Stratos Android (testée sur Amazfit Stratos 2, Stratos 3, PACE, et aussi  SUUNTO...).
 
-La première idée était de faire un simple localisateur pour enregistrer une position (parking) et la retrouver plus tard avec un écran sous forme de compas magnétique, et pourquoi pas de mémoriser les positions des parcours de golf pour faire un Gps de Golf ? Il y a maintenant la possibilité de charger des cartes Open Street Map et de créer et/ou lire des fichiers Gpx.
+La première idée était de faire un simple localisateur pour enregistrer une position (parking) et la retrouver plus tard avec un écran sous forme de compas magnétique, et pourquoi pas de mémoriser les positions des parcours de golf pour faire un Gps de Golf ? Au final, il y a maintenant la possibilité de charger des cartes Open Street Map et de créer et/ou lire des fichiers Gpx.
 
 Cette appli comporte 4 fenêtres principales :
 
