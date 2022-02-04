@@ -1,4 +1,4 @@
-# Appli GPS avec cartographie OSMaps & GPX traceur pour montre Android      ([english version](https://github.com/gege13007/Amazfit-Stratos-GPS-locator/readme_eng.md) )
+# Appli GPS avec cartographie OSMaps & GPX traceur pour montre Android      ([english version](https://github.com/gege13007/Amazfit-Stratos-GPS-locator/blob/master/readme_eng.md) )
 ----------------------------------------------------------------------
 Voici la dernière version 9.5 (début 2022) de GPS Maps & compass Locator pour montre Amazfit Android (testée sur Xiaomi Amazfit Stratos 2, Stratos 3, PACE, et SUUNTO...).
 
@@ -6,7 +6,8 @@ La première idée était de faire un simple localisateur pour enregistrer une p
 
 Cette appli comporte 4 fenêtres principales :
 
-1/ The Map viewer can display 'Open Street Maps' from zoom level 3 to 16. You can change the zoom level, and center the map on actual position with a simple click on the 3 buttons on the bottom of the screen. A distance scale and the osmap zoom level are displayed on the bottom of the screen. The scale (in km) is equal to the distance represented by the horizontal line. 
+1/ L'écran de Cartographie affiche les tuiles 'Open Street Maps' qui devront être stockées à l'avance (offline) dans le répertoire /osmaps de la montre. Nous verrons (plus loin) comment trouver les tuiles avec MOBAC. Les cartes fonctionnent par niveau de zoom (3 pour voir des pays, 16 pour voir une maison). Les symboles + et - en bas de l'écran permettent de changer de zoom. Le rond du milieu centre la carte sur la position actuelle. Une règle horizontale donne l'échelle en km.
+
 The selected GPX points are plotted on the map, with different colors depending on the altitude (blue is deep, and red is hight).
 On nav mode, a line is plotted to the destination point.
 A blue marker indicates your actual position.
