@@ -1,4 +1,4 @@
-# Appli GPS avec cartographie OSMaps & GPX traceur pour montre Android      ([english version](https://github.com/gege13007/Amazfit-Stratos-GPS-locator/blob/master/readme_eng.md) )
+# Appli GPS avec cartographie OSMaps & GPX traceur pour montre Android      ([english version](/gege13007/Amazfit-Stratos-GPS-locator/blob/master/readme_eng.md) )
 ----------------------------------------------------------------------
 Voici la dernière version 9.5 (début 2022) de GPS Maps & compass Locator pour montre Amazfit Android (testée sur Xiaomi Amazfit Stratos 2, Stratos 3, PACE, et SUUNTO...).
 
