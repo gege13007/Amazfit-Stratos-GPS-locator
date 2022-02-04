@@ -1,6 +1,5 @@
-# Android Wear GPS OpenStreet Maps & GPX reader      [english version](readme_eng.md)
-Simple &amp; effective GPS locator app for android wear
---------------------------------------------------------
+# Android Wear GPS OpenStreet Maps & GPX reader for android wear       ( [english version](readme_eng.md) )
+----------------------------------------------------------------
 Here is the last version 9.5 (december 2021) of GPS Maps & compass Locator for Wear Android (tested on Xiaomi Amazfit Stratos 2, Stratos 3, PACE, and SUUNTO...).
 I made some changes with the GPX (big) files loading process. 
 An large gpx file listing all water points in France is given for example (Water.gpx).
