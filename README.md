@@ -1,4 +1,4 @@
-# Appli GPS avec cartographie OSMaps & GPX traceur pour montre Android      ([english version](/readme_eng.md) )
+# Appli GPS avec cartographie OSMaps & GPX traceur pour montre Android      ([english version](/readme-eng.md) )
 ----------------------------------------------------------------------
 Voici la dernière version 9.5 (début 2022) de GPS Maps & compass Locator pour montre Amazfit Android (testée sur Xiaomi Amazfit Stratos 2, Stratos 3, PACE, et SUUNTO...).
 
@@ -15,7 +15,7 @@ It's possible to move the maps by simply swiping the screen.
 A LONG ClICK on the map, let you select your new Destination point (or to save a new waypoint).
 A simple click close the map.
 
-Here is an example of 2 levels of zoom from 4 to 15 (maximum details).
+Voici des exemples de cartes.
 
 <center><img src="/6-carto3.jpg" alt="gps carto osmaps"/></center>
 
