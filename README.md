@@ -1,4 +1,4 @@
-# Appli GPS avec cartographie OSMaps & GPX traceur pour montre Android      ([english version](/blob/master/readme_eng.md) )
+# Appli GPS avec cartographie OSMaps & GPX traceur pour montre Android      ([english version](/readme_eng.md) )
 ----------------------------------------------------------------------
 Voici la dernière version 9.5 (début 2022) de GPS Maps & compass Locator pour montre Amazfit Android (testée sur Xiaomi Amazfit Stratos 2, Stratos 3, PACE, et SUUNTO...).
 
@@ -23,8 +23,9 @@ Here is an example of 2 levels of zoom from 4 to 15 (maximum details).
 The compass radar will display : the time, distance & altitude to your nav destination.
 If you activate the magnetic sensor (with compatible wear) on the config window, the compass will turn to indicate the real direction.
 Without magnetic sensor, the north is on the top of screen (at 12 hours).
-A Long Click on the compass, let you mark the actual position as new Destination (or to save a new waypoint).
-Swipe to close the map.
+Un clic long sur le compas pour marquer la position actuelle comme future Destination (ou pour sauver un nouveau waypoint).
+Un clic rapide permet de incruster la vitesse , distance parcourue et altitudes en sur-impression.
+Un nouveau clic rapide ferme la vue map.
 
 <center><img src="/5-scann.jpg" alt="gps radar stratos 2"/></center>
 
