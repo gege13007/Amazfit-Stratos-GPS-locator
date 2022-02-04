@@ -1,12 +1,10 @@
-# Appli GPS avec cartographie OSMaps & GPX traceur pour montre Android      ([english version](repo/blob/master/readme_eng.md) )
+# Appli GPS avec cartographie OSMaps & GPX traceur pour montre Android      ([english version](https://github.com/gege13007/Amazfit-Stratos-GPS-locator/readme_eng.md) )
 ----------------------------------------------------------------------
-Voici la dernière version 9.5 (début 2022) de GPS Maps & compass Locator pour montre Amazfit Android (testée sur Xiaomi Amazfit Stratos 2, Stratos 3, PACE, and SUUNTO...).
-I made some changes with the GPX (big) files loading process. 
-An large gpx file listing all water points in France is given for example (Water.gpx).
+Voici la dernière version 9.5 (début 2022) de GPS Maps & compass Locator pour montre Amazfit Android (testée sur Xiaomi Amazfit Stratos 2, Stratos 3, PACE, et SUUNTO...).
 
-My first idea was to make a simple position reminder with a compass display, or a Golf Gps watch. We have now a Gpx file viewer with Open Street Maps, that's fine.
+La première idée était de faire un simple localisateur pour enregistrer une position (parking) et la retrouver plus tard avec un écran sous forme de compas magnétique, et pourquoi pas de mémoriser les positions des parcours de golf pour faire un Gps de Golf ? Il y a maintenant la possibilité de charger des cartes Open Street Map et de créer et/ou lire des fichiers Gpx.
 
-This app includes 4 main windows :
+Cette appli comporte 4 fenêtres principales :
 
 1/ The Map viewer can display 'Open Street Maps' from zoom level 3 to 16. You can change the zoom level, and center the map on actual position with a simple click on the 3 buttons on the bottom of the screen. A distance scale and the osmap zoom level are displayed on the bottom of the screen. The scale (in km) is equal to the distance represented by the horizontal line. 
 The selected GPX points are plotted on the map, with different colors depending on the altitude (blue is deep, and red is hight).
