@@ -46,12 +46,13 @@ Third (bottom) is to exit, and the arrow is to start the tracking radar. Storing
 
 <center><img src="/2-main-screen.jpg" alt="gps main menu"/></center>
 
-5/ The settings view, allows to select a gpx file (it can be an export of your sports activities).
-To enable or not, the magnetic sensor and compass mooving (not good for your battery!).
-To enable or not the automatic waypoint suggestion.
-To sort the waypoints with the distance to actual position (next wpt is the closest), or not (leave in the list order).
+5/ L'écran de réglages permet de sélectionner un fichier Gpx (du dossier /GPXData). Cela peut très bien être une ancienne trace de l'appli 'Sports' de la montre.
+- 'Auto center map' permet de centrer automatiquement la carte (en cas de footing quand on sort de la carte)...
+- 'Show POI' pour afficher les noms des Wpts sur la carte
+- 'Auto next wpt' en cas de nav vers un Wpt, force la montre à enchainer vers le prochain WPt (per exemple parcours Golf).
+- 'Active compas' pour allumer le compas dans l'écran 'Goto Wpt' - Attention à la batterie !
 
-<center><img src="/4-settings.jpg" alt="gps radar stratos 2"/></center>
+<center><img src="/4-setting.jpg" alt="gps radar stratos 2"/></center>
 
 Here's the first gps startup screen. This animation just appear for 10 seconds showing the number of satellites in view.
 The first gps fixing time depends of your situation, the meteo... From 2 to 30 seconds, it's faster if you don't move...
