@@ -81,7 +81,7 @@ Cela doit ressembler à cela.
 
 Comment ça marche
 -----------------
-La première activité au démarrage se charge de charger une fois pour toute les fichier gpx déjà choisi. Elle lance aussi un 'Service android' pour capturer les trames NMEA. Pour les transmettre je n'utilise PLUS de Broadcast mais des variables globales (classe Glob. & locationManager + locationListener). Il ne faut surtout pas éteindre et redémarrer le Gps à chaque updates ou à chaque besoin sous peine d'attendre à chaque fois un nouveau fix gps.
+La première activité au démarrage charge une fois pour toute le fichier gpx déjà choisi. Elle lance aussi un 'Service android' pour capter les trames NMEA. Pour les utiliser, je n'utilise PLUS de Broadcast mais des variables globales (classe Glob. & locationManager + locationListener). Il ne faut surtout pas éteindre et redémarrer le Gps à chaque updates ou à chaque besoin sous peine d'attendre à chaque fois un nouveau fix gps.
 J'utilise aussi un 'nmealistener' pour capter les trames $GPGSV & GPGGA pour suivre l'état du signal gps et le nombre de satellites, ainsi que VTG pour avoir la vitesse vraie.
 Le compas ('magnetic orientation sensor type3') est utilisé pour tourner les graduations de la boussole avec un 'sensorManager.registerListener'.
 Après des essais totalement infructueux d'autres librairies, j'ai décidé de faire ma propre implementation de calcul et d'affichage des tuiles OSM. Chaque tuile est une image png carrée de 256x256 pixels. Chacune est resizée à 512x512 pixels pour avoir plus de visibilité.
