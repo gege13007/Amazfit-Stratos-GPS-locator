@@ -8,12 +8,17 @@ Cette appli comporte 4 fenêtres principales :
 
 1/ L'écran de Cartographie affiche les tuiles 'Open Street Maps' qui devront être stockées à l'avance (offline) dans le répertoire /osmaps de la montre. Nous verrons (plus loin) comment trouver les tuiles avec MOBAC. Les cartes fonctionnent par niveau de zoom (3 pour voir des pays, 16 pour voir une maison). Les symboles + et - en bas de l'écran permettent de changer de zoom. Le rond du milieu centre la carte sur la position actuelle. Une règle horizontale donne l'échelle en km.
 
-The selected GPX points are plotted on the map, with different colors depending on the altitude (blue is deep, and red is hight).
-On nav mode, a line is plotted to the destination point.
-A blue marker indicates your actual position.
-It's possible to move the maps by simply swiping the screen.
-A LONG ClICK on the map, let you select your new Destination point (or to save a new waypoint).
-A simple click close the map.
+Les fichiers GPX peuvent être représentés sur la carte de deux façons :
+- une trace de points reliés dont la couleur dépend de l'altitude (bleu au plus bas, rouge en altitude) quand le fichier contient la balise TRK (trace).
+- un ensemble de points non reliés de couleur identiques quand on a une liste de WPT (POI par exemple water.gpx liste des points d'eau) - pas de balise TRK.
+En mode navigation vers un point, une ligne est dessinée vers la destination.
+Un marqueur bleu indique la position du Gps sur la carte, que l'on peut déplacer en balayant l'écran.
+
+Un Appui Court sur la carte provoque l'incrustation de la vitesse / altitude / distance, un autre Appui ferme la carte.
+
+Un Appui LONG sur la carte, permet :
+- de créer un nouveau WPT à l'endroit pointé sur la carte,
+- de démarrer l'enregistrement d'une nouvelle trace et mesure de distance.
 
 Voici des exemples de cartes.
 
@@ -53,23 +58,23 @@ The first gps fixing time depends of your situation, the meteo... From 2 to 30 s
 
 <center><img src="/1-startscreen.jpg" alt="gps startup fix"/></center>
 
-Where are the MAPS ?
+Ou mettre les MAPS ?
 -------------------
-You MUST create an 'OSMaps' directory on your wear.
-Then in OSMaps, you will have a subdirectory for each zoom level - from '2' (country level) to '16' (to see your home).
-In each subdirectory the tiles are stored with their X/Y coordinatess numbers.
-Don't worry about that, just download and run 'MOBILE ATLAS CREATOR' ( https://mobac.sourceforge.io/ ).
+Vous devez en premier créer le dossier 'OSMaps' dans le répertoire racine de votre montre avec l'explorateur de fichiers.
+Vous aurez ensuite un sous répertoire pour chaque niveau de zzom - de '2' (niveau mondial) à '16' (niveau local).
+Les noms des sous-répertoires et des tuiles permet ensuite au système de se repérer en fonction des coordonées X/Y.
+Mais n'ayez pas peur, vous n'aurez qu'à télécharger 'MOBILE ATLAS CREATOR' ( https://mobac.sourceforge.io/ ) qui se chargera de créer l'atlas de cartes.
 
 <center><img src="/mobac1.jpg" alt="mobac osm maps"/></center>
 
-Click on 'Nouvel Atlas' (OSMdroid ZIP). With the checkboxes on the left you must select the zoom level to include in your atlas.
-The level 15 includes small details and is not available for every country or cities. The level 15 represent a 2X size of datas than zoom 14, and 4X than zoom 13. So don't try to select the entire world on zoom level 14 !
+Après installation, Cliquez sur 'Nouvel Atlas' (OSMdroid ZIP). Avec les checkboxes de gauche vous devez choisir le/les niveaux de zoom à inclure dans vos cartes.
+Le niveau 15 inclus des petits détails à la limite des noms de rue, mais n'est pas disponible pour tous les pays/villes. Et il ne faut pas oublier que le zoom niveau 15 prend 4x plus de mémoire que le niveau 14, et 4x4 fois que le niveau 13... Il faudra donc bien sélectionner les zones que vous voulez couvrir !
 
-Click to valid the checkbox 'Recreer/Ajuster tuiles' !
-Click 'Ajouter a la selection', and 'Creer Atlas'.
+Cliquez sur 'Recréer/Ajuster tuiles' !
+Puis 'Ajouter à la selection', et 'Creer l'Atlas'.
 
-Unzip the file, and copy all repertories to your wear ("/OSMaps").
-You must have something like this.
+A la fin du process (qui peut être long), il n'y a plus qu'à dézipper votre atlas et à le copier tel quel dans le répertoire "/OSMaps" de la montre.
+Cela doit ressembler à cela.
 
 <center><img src="/osmaps-wear1.jpg" alt="wear osm maps"/></center>
 
@@ -84,36 +89,33 @@ We use the 'magnetic orientation sensor type3' to rotate the compass graduations
 I made my own implementation of the tiles selection formula. Each OSM tile is a 256x256 png bitmap displayed with usual canvas drawing functions.
 Each tile is resized on a 512x512 pixels bitmap, to get more visibility on small screens.
 
-Change log
-----------
-30/4/2020 First upload v1.
+Versions log
+------------
+30/4/2020 Première v1.
 
-1/5/2020  Location & NMEA broadcasted in the same manner by Locservice. Many checks to do.
-          Important Fix !!! Impossible to kill the entire process (sinking the battery). No explication. Find a solution with ' android.os.Process.killProcess(android.os.Process.myPid());' in OnDestroy().
-          RMC speed added on the scan screen.
+1/5/2020  Location & NMEA transmis par broadcast dans Locservice.
+          Gros bugs ! Impossible de fermer les process complet (vidait la batterie). Solution ' android.os.Process.killProcess(android.os.Process.myPid());' in OnDestroy().
          
-14/5/2020  Version 2 , with GPX file compatibility, and 'autonext' waypoint detection.
+14/5/2020  Version 2 , lecture des GPX, et option 'autonext' des waypoints.
 
-24/05/2020 Version 3 - many fix & Map
+24/05/2020 Version 3 - nombreuses petites corrections & modifs Map
 
-2/06/2020  Version 4 - Long click on Maps and many fixs
+2/06/2020  Version 4 - Long click sur la carte Maps & many fixs
 
 05/06/2020 Version 4.2 - modif on stop app
 
-07/06/2020 Version 4.4 - mini modif affich, alertdialog...
+07/06/2020 Version 4.4 - Modifs affichage, alertdialog...
 
-08/06/2020 V4.5 - Bug fix on start-up
-
-12/06/2020 v4.6 - Improve display on different screen dimensions (SUUNTO)
+12/06/2020 v4.6 - Modif pour different screen dimensions (SUUNTO)
 
 13/06/2020 v4.6.2 - Possible bug fix with gpx display on cartodraw
 
 15/06/2020 v4.6.4 - Modif 2 display on Suunto / bug fix on delete waypoint 
 
-4/04/2021 v5.0 - Add speed & distance and direct track saving on the Maps.
+4/04/2021 v5.0 - Calc & Incrustation speed & distance and direct track saving.
 
-12/2021 - Big changes on gpx read - only on start app, and changing gpx.
-         Read the wpt xml or the trkseg for tracks...
+12/2021 - Gros changements pour gestion des GROS Gpx - au startup...
+         Test si affichage de TRK ou de liste POI.
 
 
 
