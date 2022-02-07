@@ -79,16 +79,12 @@ Cela doit ressembler à cela.
 
 <center><img src="/osmaps-wear1.jpg" alt="wear osm maps"/></center>
 
-How this works
---------------
-The first activity launches a service who assumes the background task of getting GPS location (with a locationManager and locationListener). This avoid to stop and re-run the gps updates between each activities, and assures that just ONE first fix delay is necessary when you start the app.
-The lat & long are broadcasted to the other activities with 'sendBroadcast & broadcastReceiver'.
-The first screen uses a 'nmealistener' to get & display a snapshot of the $GPGSV & GPGGA frames.
-The location service and its broadcats is only stopped, when the app is destroyed (if not - your battery don't last so long)...
-We use the 'magnetic orientation sensor type3' to rotate the compass graduations and map, with a sensorManager.registerListener.
-
-I made my own implementation of the tiles selection formula. Each OSM tile is a 256x256 png bitmap displayed with usual canvas drawing functions.
-Each tile is resized on a 512x512 pixels bitmap, to get more visibility on small screens.
+Comment ça marche
+-----------------
+La première activité au démarrage se charge de charger une fois pour toute les fichier gpx déjà choisi. Elle lance aussi un 'Service android' pour capturer les trames NMEA. Pour les transmettre je n'utilise PLUS de Broadcast mais des variables globales (classe Glob. & locationManager + locationListener). Il ne faut surtout pas éteindre et redémarrer le Gps à chaque updates ou à chaque besoin sous peine d'attendre à chaque fois un nouveau fix gps.
+J'utilise aussi un 'nmealistener' pour capter les trames $GPGSV & GPGGA pour suivre l'état du signal gps et le nombre de satellites, ainsi que VTG pour avoir la vitesse vraie.
+Le compas ('magnetic orientation sensor type3') est utilisé pour tourner les graduations de la boussole avec un 'sensorManager.registerListener'.
+Après des essais totalement infructueux d'autres librairies, j'ai décidé de faire ma propre implementation de calcul et d'affichage des tuiles OSM. Chaque tuile est une image png carrée de 256x256 pixels. Chacune est resizée à 512x512 pixels pour avoir plus de visibilité.
 
 Versions log
 ------------
@@ -114,6 +110,8 @@ Versions log
 15/06/2020 v4.6.4 - Modif 2 display on Suunto / bug fix on delete waypoint 
 
 4/04/2021 v5.0 - Calc & Incrustation speed & distance and direct track saving.
+
+11/2021 - Capture de trame VTG pour affichage vitesse vraie. GSV pour nombre de satellites en vue.
 
 12/2021 - Gros changements pour gestion des GROS Gpx - au startup...
          Test si affichage de TRK ou de liste POI.
