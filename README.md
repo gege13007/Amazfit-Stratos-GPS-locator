@@ -33,7 +33,7 @@ Un Appui LONG sur la carte, permet :
 
 Voici des exemples de cartes.
 
-<center><img src="/6-carto3.jpg" alt="gps carto osmaps"/><img src="/cartos-2020-06-01.jpg"></center>
+<center><img src="/cartos-2020-06-01.jpg" alt="gps carto osmaps"/></center>
 
 4/ L'écran de navigation Compas est actif quand un point de destination a déjà été sélectionné (long clic sur la carte), ou un Wpt dans la liste Gpx.
 L'écran compas radar va afficher : l'heure, la distance à destination, et l'altitude.
