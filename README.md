@@ -17,7 +17,7 @@ En bas, le bouton pour l'écran 'Map', et celui de l'écran 'Compas'. Le compas 
 
 <center><img src="/2-main-screen.jpg" alt="gps main menu"/></center>
 
-3/ L'écran de Cartographie affiche les tuiles 'Open Street Maps' qui devront être stockées à l'avance (offline) dans le répertoire /osmaps de la montre. Nous verrons (plus loin) comment trouver les tuiles avec MOBAC. Les cartes fonctionnent par niveau de zoom (3 pour voir des pays, 16 pour voir une maison). Les symboles + et - en bas de l'écran permettent de changer de zoom. Le rond du milieu centre la carte sur la position actuelle. Une règle horizontale donne l'échelle en km.
+3/ L'écran de Cartographie affiche les tuiles 'Open Street Maps' qui devront être stockées à l'avance (offline) dans le répertoire '/osmaps' de la montre. Nous verrons (plus loin) comment trouver les tuiles avec MOBAC (Mobile Atlas Creator). Les cartes fonctionnent par niveau de zoom (niveau 3 pour voir des pays entiers, 16 pour voir une maison). Les symboles + et - en bas de l'écran permettent de changer de zoom. Le rond du milieu centre la carte sur la position gps actuelle. Une règle horizontale donne l'échelle en km.
 
 Les fichiers GPX peuvent être représentés sur la carte de deux façons :
 - une trace de points reliés dont la couleur dépend de l'altitude (bleu au plus bas, rouge en altitude) quand le fichier contient la balise TRK (trace).
