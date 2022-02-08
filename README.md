@@ -4,9 +4,20 @@ Voici la dernière version 9.5 de mon appli GPS OSMaps & compass Locator pour mo
 
 La première idée était de faire un simple localisateur pour enregistrer une position (parking) et la retrouver plus tard avec un écran sous forme de compas magnétique, et pourquoi pas de mémoriser les positions des parcours de golf pour faire un Gps de Golf ? Au final, il y a maintenant la possibilité de charger des cartes Open Street Map et de créer et/ou lire des fichiers Gpx.
 
-Cette appli comporte 4 fenêtres principales :
+Cette appli comporte plusieurs fenêtres principales :
 
-1/ L'écran de Cartographie affiche les tuiles 'Open Street Maps' qui devront être stockées à l'avance (offline) dans le répertoire /osmaps de la montre. Nous verrons (plus loin) comment trouver les tuiles avec MOBAC. Les cartes fonctionnent par niveau de zoom (3 pour voir des pays, 16 pour voir une maison). Les symboles + et - en bas de l'écran permettent de changer de zoom. Le rond du milieu centre la carte sur la position actuelle. Une règle horizontale donne l'échelle en km.
+1/ L'écran de démarrage représente une animation 'radar' pendant le démarrage du gps, et surtout le chargement d'un fichier Gpx présélectionné.
+Le nombre de Wpt est affiché puis le menu principale apparait.
+
+<center><img src="/1-startscreen.jpg" alt="gps startup fix"/></center>
+
+2/ Le menu principal apparait même si la position Gps n'est pas connue. Dans ce cas 'Searching sats' clignote et le symbole de compas est en rouge (inactif). Le numéro des satellites en vue est affiché - plus il y en a, mieux c'est !
+En haut, on trouve les boutons de 'Réglage' et 'Liste Wpt Gpx'.
+En bas, le bouton pour l'écran 'Map', et celui de l'écran 'Compas'.
+
+<center><img src="/2-main-screen.jpg" alt="gps main menu"/></center>
+
+3/ L'écran de Cartographie affiche les tuiles 'Open Street Maps' qui devront être stockées à l'avance (offline) dans le répertoire /osmaps de la montre. Nous verrons (plus loin) comment trouver les tuiles avec MOBAC. Les cartes fonctionnent par niveau de zoom (3 pour voir des pays, 16 pour voir une maison). Les symboles + et - en bas de l'écran permettent de changer de zoom. Le rond du milieu centre la carte sur la position actuelle. Une règle horizontale donne l'échelle en km.
 
 Les fichiers GPX peuvent être représentés sur la carte de deux façons :
 - une trace de points reliés dont la couleur dépend de l'altitude (bleu au plus bas, rouge en altitude) quand le fichier contient la balise TRK (trace).
@@ -17,47 +28,33 @@ Un marqueur bleu indique la position du Gps sur la carte, que l'on peut déplace
 Un Appui Court sur la carte provoque l'incrustation de la vitesse / altitude / distance, un autre Appui ferme la carte.
 
 Un Appui LONG sur la carte, permet :
-- de créer un nouveau WPT à l'endroit pointé sur la carte,
+- de créer un nouveau WPT à l'endroit pointé sur la carte, cela devient le nouveau point de Destination de navigation (-> écran compas). 
 - de démarrer l'enregistrement d'une nouvelle trace et mesure de distance.
 
 Voici des exemples de cartes.
 
 <center><img src="/6-carto3.jpg" alt="gps carto osmaps"/></center>
 
-2/ The compass is active when you firstly have selected a nav destination (long click on map or compas), or a waypoint in your Gpx file list.
-The compass radar will display : the time, distance & altitude to your nav destination.
-If you activate the magnetic sensor (with compatible wear) on the config window, the compass will turn to indicate the real direction.
-Without magnetic sensor, the north is on the top of screen (at 12 hours).
+4/ L'écran de navigation Compas est actif quand un point de destination a déjà été sélectionné (long clic sur la carte), ou un Wpt dans la liste Gpx.
+L'écran compas radar va afficher : l'heure, la distance à destination, et l'altitude.
+Si le compas magnétique est acif (-> réglages - attention les piles), la flèche doit indiquer le cap réel vers la cible. Sinon, il faut considérer que l'écran du compas représente le Nord en haut.
 Un clic long sur le compas pour marquer la position actuelle comme future Destination (ou pour sauver un nouveau waypoint).
-Un clic rapide permet de incruster la vitesse , distance parcourue et altitudes en sur-impression.
-Un nouveau clic rapide ferme la vue map.
 
 <center><img src="/5-scann.jpg" alt="gps radar stratos 2"/></center>
 
-3/ The Gpx list view, allows you select a destination by simple click on list.
-A 'LONG CLICK' remove the point. A 'simple click' select your destination.
-You must have a 'gpx' directory on the root of the wear (external storage memory).
+5/ La fenêtre de liste de points Gpx permet de voir, sélectionner ou supprimer un Wpt particulier. C'est surtout utile dans des petits fichiers (liste de trous au golf, ... de moins de 100 points).
+Un 'LONG CLIC' permet de supprimer un point. Un 'clic court' sélectionne le point comme destination.
+Il faudra bien sur avoir un dossier 'GPXData' présent à la racine de la mémoire de la montre (external storage memory).
 
 <center><img src="/3-wpt-liste.jpg" alt="liste waypoint gps menu"/></center>
 
-4/ The main menu appears even if the position is not ok. So it's possible to change the settings, or to find and select a waypoint to track.
-From up left to right : first button start the settings, the second is for select a Gps waypoint from a gpx file.
-Third (bottom) is to exit, and the arrow is to start the tracking radar. Storing the current position or not.
-
-<center><img src="/2-main-screen.jpg" alt="gps main menu"/></center>
-
-5/ L'écran de réglages permet de sélectionner un fichier Gpx (du dossier /GPXData). Cela peut très bien être une ancienne trace de l'appli 'Sports' de la montre.
+6/ L'écran de réglage permet de sélectionner un fichier Gpx (du dossier /GPXData). Cela peut très bien être une ancienne trace de l'appli 'Sports' de la montre.
 - 'Auto center map' permet de centrer automatiquement la carte (en cas de footing quand on sort de la carte)...
 - 'Show POI' pour afficher les noms des Wpts sur la carte
 - 'Auto next wpt' en cas de nav vers un Wpt, force la montre à enchainer vers le prochain WPt (per exemple parcours Golf).
 - 'Active compas' pour allumer le compas dans l'écran 'Goto Wpt' - Attention à la batterie !
 
 <center><img src="/4-setting.jpg" alt="gps radar stratos 2"/></center>
-
-Here's the first gps startup screen. This animation just appear for 10 seconds showing the number of satellites in view.
-The first gps fixing time depends of your situation, the meteo... From 2 to 30 seconds, it's faster if you don't move...
-
-<center><img src="/1-startscreen.jpg" alt="gps startup fix"/></center>
 
 Ou mettre les MAPS ?
 -------------------
