@@ -7,13 +7,13 @@ La première idée était de faire un simple localisateur pour enregistrer une p
 Cette appli comporte plusieurs fenêtres principales :
 
 1/ L'écran de démarrage représente une animation 'radar' pendant le démarrage du gps, et surtout le chargement d'un fichier Gpx présélectionné.
-Le nombre de Wpt est affiché puis le menu principale apparait.
+Le nombre de Wpt est affiché ainsi que le nom du fichier Gpx en cours (si il y en a un).
 
 <center><img src="/1-startscreen.jpg" alt="gps startup fix"/></center>
 
-2/ Le menu principal apparait même si la position Gps n'est pas connue. Dans ce cas 'Searching sats' clignote et le symbole de compas est en rouge (inactif). Le numéro des satellites en vue est affiché - plus il y en a, mieux c'est !
+2/ Le menu principal apparait même si la position Gps n'est pas connue. Dans ce cas 'Searching sats' clignote et le symbole du mode compas reste en rouge (inactif). Le numéro des satellites en vue est affiché - plus il y en a, mieux c'est !
 En haut, on trouve les boutons de 'Réglage' et 'Liste Wpt Gpx'.
-En bas, le bouton pour l'écran 'Map', et celui de l'écran 'Compas'.
+En bas, le bouton pour l'écran 'Map', et celui de l'écran 'Compas'. Le compas passe au vert dès que la position est captée. L'aiguille oscille de gauche à droite quand une nav est en cours.
 
 <center><img src="/2-main-screen.jpg" alt="gps main menu"/></center>
 
