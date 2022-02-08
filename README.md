@@ -50,7 +50,7 @@ Il faudra bien sur avoir un dossier 'GPXData' présent à la racine de la mémoi
 
 Petite vidéo:
 
-[![Watch the video](https://img.youtube.com/vi/wQFpLjr38FY/maxresdefault.jpg)](https://youtu.be/wQFpLjr38FY)
+<center> [![Watch the video](https://img.youtube.com/vi/wQFpLjr38FY/maxresdefault.jpg)](https://youtu.be/wQFpLjr38FY) </center>
 
 
 6/ L'écran de réglage permet de sélectionner un fichier Gpx (du dossier /GPXData). Cela peut très bien être une ancienne trace de l'appli 'Sports' de la montre.
