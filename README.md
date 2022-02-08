@@ -37,7 +37,7 @@ Voici des exemples de cartes.
 
 Petite vidéo:
 
-[![Watch the video](https://img.youtube.com/vi/wQFpLjr38FY/maxresdefault.jpg)](https://youtu.be/wQFpLjr38FY)
+[![Watch the video](/ptite-video.jpg)](https://youtu.be/wQFpLjr38FY)
 
 4/ L'écran de navigation Compas est actif quand un point de destination a déjà été sélectionné (long clic sur la carte), ou un Wpt dans la liste Gpx.
 L'écran compas radar va afficher : l'heure, la distance à destination, et l'altitude.
