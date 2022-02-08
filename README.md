@@ -35,6 +35,10 @@ Voici des exemples de cartes.
 
 <center><img src="/cartos-2020-06-01.jpg" alt="gps carto osmaps"/></center>
 
+Petite vidéo:
+
+[![Watch the video](https://img.youtube.com/vi/wQFpLjr38FY/maxresdefault.jpg)](https://youtu.be/wQFpLjr38FY)
+
 4/ L'écran de navigation Compas est actif quand un point de destination a déjà été sélectionné (long clic sur la carte), ou un Wpt dans la liste Gpx.
 L'écran compas radar va afficher : l'heure, la distance à destination, et l'altitude.
 Si le compas magnétique est acif (-> réglages - attention les piles), la flèche doit indiquer le cap réel vers la cible. Sinon, il faut considérer que l'écran du compas représente le Nord en haut.
@@ -47,11 +51,6 @@ Un 'LONG CLIC' permet de supprimer un point. Un 'clic court' sélectionne le poi
 Il faudra bien sur avoir un dossier 'GPXData' présent à la racine de la mémoire de la montre (external storage memory).
 
 <center><img src="/3-wpt-liste.jpg" alt="liste waypoint gps menu"/></center>
-
-Petite vidéo:
-
-<center> [![Watch the video](https://img.youtube.com/vi/wQFpLjr38FY/maxresdefault.jpg)](https://youtu.be/wQFpLjr38FY) </center>
-
 
 6/ L'écran de réglage permet de sélectionner un fichier Gpx (du dossier /GPXData). Cela peut très bien être une ancienne trace de l'appli 'Sports' de la montre.
 - 'Auto center map' permet de centrer automatiquement la carte (en cas de footing quand on sort de la carte)...
