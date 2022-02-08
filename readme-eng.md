@@ -1,4 +1,4 @@
-# Android Wear GPS OpenStreet Maps & GPX reader for Android wear     [french version](Amazfit-Stratos-GPS-locator/blob/master/readme.md)
+# Android Wear GPS OpenStreet Maps & GPX reader for Android wear     [french version](/readme.md)
 ----------------------------------------------------------------
 Here is the last version 9.5 (december 2021) of GPS Maps & compass Locator for Wear Android (tested on Xiaomi Amazfit Stratos 2, Stratos 3, PACE, and SUUNTO...).
 I made some changes with the GPX (big) files loading process. 
