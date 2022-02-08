@@ -48,6 +48,9 @@ Il faudra bien sur avoir un dossier 'GPXData' présent à la racine de la mémoi
 
 <center><img src="/3-wpt-liste.jpg" alt="liste waypoint gps menu"/></center>
 
+[![Watch the video](https://youtu.be/wQFpLjr38FY)
+
+
 6/ L'écran de réglage permet de sélectionner un fichier Gpx (du dossier /GPXData). Cela peut très bien être une ancienne trace de l'appli 'Sports' de la montre.
 - 'Auto center map' permet de centrer automatiquement la carte (en cas de footing quand on sort de la carte)...
 - 'Show POI' pour afficher les noms des Wpts sur la carte
