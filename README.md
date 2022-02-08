@@ -38,9 +38,9 @@ Voici des exemples de cartes.
 4/ L'écran de navigation Compas est actif quand un point de destination a déjà été sélectionné (long clic sur la carte), ou un Wpt dans la liste Gpx.
 L'écran compas radar va afficher : l'heure, la distance à destination, et l'altitude.
 Si le compas magnétique est acif (-> réglages - attention les piles), la flèche doit indiquer le cap réel vers la cible. Sinon, il faut considérer que l'écran du compas représente le Nord en haut.
-Un clic long sur le compas pour marquer la position actuelle comme future Destination (ou pour sauver un nouveau waypoint).
+Un clic long sur le compas permet de marquer la position actuelle comme future Destination (ou pour sauver un nouveau waypoint).
 
-<center><img src="/5-scann.jpg" alt="gps radar stratos 2"/></center>
+<center><img src="/5-scann.jpg" alt="gps radar stratos amazfit"/></center>
 
 5/ La fenêtre de liste de points Gpx permet de voir, sélectionner ou supprimer un Wpt particulier. C'est surtout utile dans des petits fichiers (liste de trous au golf, ... de moins de 100 points).
 Un 'LONG CLIC' permet de supprimer un point. Un 'clic court' sélectionne le point comme destination.
