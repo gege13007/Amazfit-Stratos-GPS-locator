@@ -4,7 +4,7 @@ Here is the last version 9.5 (december 2021) of GPS Maps & compass Locator for W
 I made some changes with the GPX (big) files loading process. 
 An large gpx file listing all water points in France is given for example (Water.gpx).
 
-My first idea was to make a simple position reminder with a compass display, or a Golf Gps watch. We have now a Gpx file viewer with Open Street Maps, that's fine.
+My first idea was to make a simple position reminder with a compass display, or a Golf Gps watch. We have now a Gpx file viewer with Open Street Maps.
 
 This app includes 4 main windows :
 
@@ -31,25 +31,25 @@ Swipe to close the map.
 
 3/ The Gpx list view, allows you select a destination by simple click on list.
 A 'LONG CLICK' remove the point. A 'simple click' select your destination.
-You must have a 'gpx' directory on the root of the wear (external storage memory).
+You must have a 'GPXData' directory on the root of the wear (external storage memory).
 
 <center><img src="/3-wpt-liste.jpg" alt="liste waypoint gps menu"/></center>
 
 4/ The main menu appears even if the position is not ok. So it's possible to change the settings, or to find and select a waypoint to track.
 From up left to right : first button start the settings, the second is for select a Gps waypoint from a gpx file.
-Third (bottom) is to exit, and the arrow is to start the tracking radar. Storing the current position or not.
+Third (bottom) button is for the Map, and the arrow is for the tracking radar.
 
 <center><img src="/2-main-screen.jpg" alt="gps main menu"/></center>
 
 5/ The settings view, allows to select a gpx file (it can be an export of your sports activities).
-To enable or not, the magnetic sensor and compass mooving (not good for your battery!).
-To enable or not the automatic waypoint suggestion.
-To sort the waypoints with the distance to actual position (next wpt is the closest), or not (leave in the list order).
+To enable the magnetic sensor and compass mooving (not good for your battery!).
+To enable the automatic next waypoint selection.
+To enable automatic centering map when moving.
 
 <center><img src="/4-settings.jpg" alt="gps radar stratos 2"/></center>
 
 Here's the first gps startup screen. This animation just appear for 10 seconds showing the number of satellites in view.
-The first gps fixing time depends of your situation, the meteo... From 2 to 30 seconds, it's faster if you don't move...
+The first gps fixing time depends of your situation, the meteo...
 
 <center><img src="/1-startscreen.jpg" alt="gps startup fix"/></center>
 
