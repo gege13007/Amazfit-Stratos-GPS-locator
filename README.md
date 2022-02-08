@@ -48,6 +48,8 @@ Il faudra bien sur avoir un dossier 'GPXData' présent à la racine de la mémoi
 
 <center><img src="/3-wpt-liste.jpg" alt="liste waypoint gps menu"/></center>
 
+Petite vidéo:
+
 [![Watch the video](https://img.youtube.com/vi/wQFpLjr38FY/maxresdefault.jpg)](https://youtu.be/wQFpLjr38FY)
 
 
